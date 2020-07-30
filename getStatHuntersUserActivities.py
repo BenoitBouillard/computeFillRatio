@@ -52,11 +52,15 @@ def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
 def myurlretrieve(url, filename=None, reporthook=None, data=None):
     return urlretrieve(url, filename, reporthook, data)
 
-def getStatHuntersUserActivities(username, sharelink):
+def getStatHuntersUserActivities(username, sharelink, full=False):
+    page = 1
     if not os.path.exists(username):
         os.makedirs(username)
+
+    if full == False:
+        while os.path.exists(os.path.join(username, "activities_{}.json".format(page + 2))):
+            page += 1
         
-    page = 1
     while True:
         # https://www.statshunters.com/share/b83b3a6d86d5
         filepath = os.path.join(username, "activities_{}.json".format(page))

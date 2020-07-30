@@ -2,7 +2,10 @@ from fastkml import kml, styles
 from tile import TileFromCoord, Tile
 from pprint import pprint
 from shapely.geometry import Polygon
+import shapely
 import argparse
+import os
+import json
 
 def kmlZoneToTiles(kml_file):
     k = kml.KML()
@@ -13,33 +16,37 @@ def kmlZoneToTiles(kml_file):
     features = list(k.features())
     folder = list(features[0].features())[0]
     geometry = folder.geometry
-    if len(geometry.geoms) != 1:
-        print("!!! Only manage geometry with 1 line !!!")
-        exit(0)
-    lineString = geometry.geoms[0]
-    polygon = Polygon(lineString)
-    (minx, miny, maxx, maxy) = polygon.bounds
-    
-    tileMinX, tileMinY = TileFromCoord(miny, minx)
-    tileMaxX, tileMaxY = TileFromCoord(maxy, maxx)
-    if tileMaxX < tileMinX:
-        tmp = tileMinX
-        tileMinX = tileMaxX
-        tileMaxX = tmp
-    if tileMaxY < tileMinY:
-        tmp = tileMinY
-        tileMinY = tileMaxY
-        tileMaxY = tmp
     tiles = []
     n = 0
-    for x in range(tileMinX, tileMaxX+1):
-        for y in range(tileMinY, tileMaxY+1):
-            n = n+1
-            t = Tile("{}_{}".format(x, y))
-            if t.polygon.intersects(polygon):
-                tiles.append(t)
-    return tiles
     
+    if hasattr(geometry, 'geoms'):
+    #if isinstance(geometry, shapely.geometry.collection.GeometryCollection):
+        geoms = geometry.geoms
+    else:
+        geoms = [ geometry ]
+
+    for geo in geoms:
+        polygon = Polygon(geo)
+        (minx, miny, maxx, maxy) = polygon.bounds
+        
+        tileMinX, tileMinY = TileFromCoord(miny, minx)
+        tileMaxX, tileMaxY = TileFromCoord(maxy, maxx)
+        if tileMaxX < tileMinX:
+            tmp = tileMinX
+            tileMinX = tileMaxX
+            tileMaxX = tmp
+        if tileMaxY < tileMinY:
+            tmp = tileMinY
+            tileMinY = tileMaxY
+            tileMaxY = tmp
+        for x in range(tileMinX, tileMaxX+1):
+            for y in range(tileMinY, tileMaxY+1):
+                n = n+1
+                t = Tile("{}_{}".format(x, y))
+                if t.polygon.intersects(polygon):
+                    tiles.append(t)
+    return tiles
+        
 
 def createKmlForTiles(tiles, kml_file):
     # Create the root KML object
@@ -66,7 +73,7 @@ def createKmlForTiles(tiles, kml_file):
     # second folder of the Document
     for t in tiles:
         p = kml.Placemark(ns)
-        p.geometry =  t.polygon #Polygon([(0, 0, 0), (1, 1, 0), (1, 0, 1)])
+        p.geometry =  t.polygon
         f2.append(p)
     
     with open(kml_file, 'w') as myfile:
@@ -88,29 +95,58 @@ def tilesFromKml(kml_file):
         tiles.append(tile.uid)
     return tiles
 
-
-
-parser = argparse.ArgumentParser(description='Compute exploration ratio of a zone')
-parser.add_argument('-z','--zone', dest="zonefile", default=r"zone.kml", help="Zone KML file")
-parser.add_argument('-e','--explored', dest="exploredfile", default=r"explored_tiles.kml",  help="Explored KML file from veloviewer")
-parser.add_argument('-o','--output', dest="outputfile", default=r"zone_unexplored_tiles.kml", help="Output KML file of unexplored tiles")
-args = parser.parse_args()
-
-zonefile          = vars(args)['zonefile']
-exploredfile      = vars(args)['exploredfile']
-outputfile        = vars(args)['outputfile']
-
-tiles = kmlZoneToTiles(zonefile)
-exploredTiles = tilesFromKml(exploredfile)
-
-unexploredTiles = []
-
-for tile in tiles:
-    if tile.uid not in exploredTiles:
-       unexploredTiles.append(tile) 
+def tilesFromActivities(activities_dir):
+    # Get tiles from activities files from stathunters
+    directory = os.fsencode(activities_dir)
+    tiles = []
+        
+    for file in os.listdir(directory):
+        filename = os.fsdecode(file)
+        if filename.endswith(".json"): 
+            with open(os.path.join(activities_dir, filename)) as f:
+                d = json.load(f)
+                for activity in d['activities']:
+                    for tile in activity['tiles']:
+                        uid = "{0}_{1}".format(tile['x'], tile['y'])
+                        if uid not in tiles:
+                            tiles.append(uid)
+    return tiles
        
-exploredTileCount = len(tiles) - len(unexploredTiles)
-      
-print("Exploration ratio : {:.1f}% ({} of {})".format(100*exploredTileCount/len(tiles), exploredTileCount, len(tiles)))
+def computeFillRatio(zonefile, exploredfile, outputfile=None):
+    # Get tiles from the zone
+    tiles = kmlZoneToTiles(zonefile)
 
-createKmlForTiles(unexploredTiles, outputfile)
+    if os.path.isdir(exploredfile):
+        exploredTiles = tilesFromActivities(exploredfile)
+    else:
+        exploredTiles = tilesFromKml(exploredfile)
+
+    unexploredTiles = []
+
+    for tile in tiles:
+        if tile.uid not in exploredTiles:
+           unexploredTiles.append(tile) 
+           
+    exploredTileCount = len(tiles) - len(unexploredTiles)
+    
+    ratio = exploredTileCount/len(tiles)
+          
+    if outputfile:
+        createKmlForTiles(unexploredTiles, outputfile)
+        
+    return ratio, exploredTileCount, len(tiles)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Compute exploration ratio of a zone')
+    parser.add_argument('-z','--zone', dest="zonefile", default=r"zone.kml", help="Zone KML file")
+    parser.add_argument('-e','--explored', dest="exploredfile", default=r"explored_tiles.kml",  help="Explored KML file from veloviewer or folder of activities.json for stathunter")
+    parser.add_argument('-o','--output', dest="outputfile", default=r"zone_unexplored_tiles.kml", help="Output KML file of unexplored tiles")
+    args = parser.parse_args()
+
+    zonefile          = vars(args)['zonefile']
+    exploredfile      = vars(args)['exploredfile']
+    outputfile        = vars(args)['outputfile']
+
+    ratio, exploredTileCount, tiles_count = computeFillRatio(zonefile, exploredfile, outputfile)
+    print("Exploration ratio : {:.1f}% ({} of {})".format(100.0*ratio, exploredTileCount, tiles_count))
+    
