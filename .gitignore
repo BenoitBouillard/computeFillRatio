@@ -1,4 +1,6 @@
 __pycache__/
 *.pyc
-/gen/
-users.config
+gen/
+users.json
+zones/gen/
+venv/

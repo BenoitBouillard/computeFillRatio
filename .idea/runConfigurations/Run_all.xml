@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Run all" type="CompoundRunConfigurationType">
+    <toRun name="ranking_fr_stats" type="PythonConfigurationType" />
+    <toRun name="users_report" type="PythonConfigurationType" />
+    <toRun name="community_fill_zones" type="PythonConfigurationType" />
+    <toRun name="ranking_fill_zones" type="PythonConfigurationType" />
+    <toRun name="SHC 2021 ALL" type="PythonConfigurationType" />
+    <method v="2" />
+  </configuration>
+</component>
