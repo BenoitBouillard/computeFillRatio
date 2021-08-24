@@ -86,6 +86,8 @@ python get_users_activities.py --full
 
 #### Challenges
 
+To compute challenges results for a given month.
+
 ```
 python challenge.py -c 2021 -i 2
 ```
