@@ -20,9 +20,12 @@ Path(GEN_ZONES).mkdir(exist_ok=True, parents=True)
 Path(GEN_ZONES_TILES).mkdir(exist_ok=True, parents=True)
 
 
-def load_users():
+def load_users(only_url=True):
     with open(USERS_CONFIG_FILE, encoding='utf-8') as f:
-        return json.load(f)
+        users = json.load(f)
+    if only_url:
+        users = list(filter(lambda user: 'url'  in user and user['url'] is not False, users))
+    return users
 
 
 def load_config():

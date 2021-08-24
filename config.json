@@ -23,12 +23,30 @@
             "datetime.fromisoformat(activity['date']) < datetime(2021 + int(index/12), 1+(index%12), 1)"
         ]
     },
+    "Y2021_Run" : {
+        "activity_type" : "Run",
+        "sort" : ["cluster", "square"],
+        "compare": true,
+        "filter" : [
+            "datetime.fromisoformat(activity['date']) >= datetime(2021, 1, 1)",
+            "datetime.fromisoformat(activity['date']) < datetime(2021 + int(index/12), 1+(index%12), 1)"
+        ]
+    },
+    "Y2021_Ride" : {
+        "activity_type" : "Ride",
+        "sort" : ["cluster", "square"],
+        "compare": true,
+        "filter" : [
+            "datetime.fromisoformat(activity['date']) >= datetime(2021, 1, 1)",
+            "datetime.fromisoformat(activity['date']) < datetime(2021 + int(index/12), 1+(index%12), 1)"
+        ]
+    },
     "2021_RunFromHome" : {
         "activity_type" : "Run",
         "sort" : ["square"],
         "compare": "index>1",
         "filter" : [
-            "re.search('#FromHome|#d1|#Home', activity['name'], re.IGNORECASE)",
+            "re.search('#d1|#(\\S)*Home|fromhome', activity['name'], re.IGNORECASE)",
             "datetime.fromisoformat(activity['date']) >= datetime(2021, 1, 1)",
             "datetime.fromisoformat(activity['date']) < datetime(2021 + int(index/12), 1+(index%12), 1)"
         ]

@@ -109,11 +109,11 @@ console output:
 * list of ranking for users, sorted by number of visited departement
 
 statistics:
-* NB: number of visited departement
-* EDD.: Eddington number departement vs. number of visited tiles (i.e. value of 10 means that user has visited 10 departements with at least 10 visited tiles for each)
-* EDD.*10: Eddington number departement vs. 10*(number of visited tiles) (i.e. value of 10 means that user has visited 10 departements with at least 100 visited tiles for each)
-* SQUARES: Sum of the max square on each departement
-* EDD.SQUARES: Eddington number departement vs. departement max square (i.e. value of 10 means that user has 10 departements with at least 10x10 max square)
+* **NB**: number of visited departement
+* **BBI**: Index of numer of departement vs. number of visited tiles (i.e. value of 10 means that user has visited 10 departements with at least 10 visited tiles for each)
+* __BBI*10__: Index of  number departement vs. 10*(number of visited tiles) (i.e. value of 10 means that user has visited 10 departements with at least 100 visited tiles for each)
+* **SQUARES**: Sum of the max square on each departement
+* **BBI.SQUARES**: Index of number departement vs. departement max square (i.e. value of 10 means that user has 10 departements with at least 10x10 max square)
 
 #### Community fill zones
 

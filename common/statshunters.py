@@ -18,7 +18,6 @@ def get_statshunters_user_activities(path, sharelink, full=False):
 
     last_activity = None
     while True:
-        # https://www.statshunters.com/share/b83b3a6d86d5
         filepath = os.path.join(path, "activities_{}.json".format(page))
         url = sharelink + "/api/activities?page={0}".format(page)
         print("Get page {} ({})".format(page, url))
@@ -31,7 +30,7 @@ def get_statshunters_user_activities(path, sharelink, full=False):
         page += 1
     print("Last activity:", last_activity)
 
-    return True
+    return last_activity
 
 
 def load_user_activities(user_id, filter_fct=None):

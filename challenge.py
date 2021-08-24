@@ -14,7 +14,7 @@ FIELDS = ['square', 'cluster', 'tiles', 'activities']
 
 def compute_challenges(challenge_str=None, index=None):
     config = load_config()
-    users_json = load_users()
+    users_json = load_users(only_url=False)
 
     if challenge_str in config['challenges']:
         challenges = [challenge_str]
@@ -43,6 +43,15 @@ def compute_challenges(challenge_str=None, index=None):
             results = OrderedDict()
 
             for user in users:
+                if user['url'] is False:
+                    index = for_index - 1
+                    if index >= len(user["challenges"][challenge]):
+                        index = len(user["challenges"][challenge]) - 1
+
+                    results[user['name']] = user["challenges"][challenge][index].copy()
+                    results[user['name']]['user'] = user['name']
+                    results[user['name']]['activities'] = None
+                    continue
                 url_uid = user['url'].split('/')[-1]
                 activities_list = statshunters.load_user_activities(os.path.join(url_uid))
                 activities_list = list(filter(lambda a: a['type'] in activity_types, activities_list))
@@ -78,8 +87,8 @@ def compute_challenges(challenge_str=None, index=None):
 
         users_results = compute_results(users, index)
 
-        users = list(filter(lambda u: users_results[u['name']]['activities'] > 0, users))
-        users_results = OrderedDict(filter(lambda kvp: kvp[1]['activities'] > 0, users_results.items()))
+        users = list(filter(lambda u: users_results[u['name']]['activities'] is None or users_results[u['name']]['activities'] > 0, users))
+        users_results = OrderedDict(filter(lambda kvp: kvp[1]['activities'] is None or kvp[1]['activities'] > 0, users_results.items()))
 
         if compare:
             users_results_prev = compute_results(users, index - 1)
@@ -87,8 +96,9 @@ def compute_challenges(challenge_str=None, index=None):
                 users_results[userName]["rank_diff"] = users_results_prev[userName]['rank'] - \
                                                            users_results[userName]['rank']
                 for field in FIELDS:
-                    users_results[userName][field + "_diff"] = users_results[userName][field] - \
-                                                               users_results_prev[userName][field]
+                    if users_results[userName][field] is not None:
+                        users_results[userName][field + "_diff"] = users_results[userName][field] - \
+                                                                   users_results_prev[userName][field]
 
         if compare:
             format_str = "{0:<2} {2:>4} {1:<16}"
@@ -115,14 +125,19 @@ def compute_challenges(challenge_str=None, index=None):
                 line_str = format_str.format(result['rank'], result['user'], "")
 
             for sf in sort_fields:
-                line = " {:>5}".format(result[sf])
-                if compare:
-                    p = "({:+3})".format(result[sf + "_diff"])
-                    if len(p) < 6:
-                        p += " " * (6 - len(p))
-                    line += p
+                if result[sf] is None:
+                    line = "   ???"
+                    if compare:
+                        line += "     "
                 else:
-                    line += "     "
+                    line = " {:>5.0f}".format(result[sf])
+                    if compare:
+                        p = "({:+4.0f})".format(result[sf + "_diff"])
+                        if len(p) < 6:
+                            p += " " * (6 - len(p))
+                        line += p
+                    else:
+                        line += "     "
 
                 line_str += line
 

@@ -1,6 +1,3 @@
-import os
-from pathlib import Path
-
 from common.config import load_users
 from common.zones import load_zones_outer
 from common.statshunters import tiles_from_activities
@@ -19,7 +16,6 @@ def eddigton(data, factor=1):
             break
         eddington += 1
     return eddington - 1
-
 
 for user in users:
     print("Treat " + user['name'])
@@ -44,7 +40,7 @@ for user in users:
     user['eddingtonSquare'] = eddigton(user['maxsquare'].values())
 
 pos = 0
-print("#   {:17} {:>6} {:>6} {:>6} {:>6} {:>6}".format("NOM", "NB", "EDD.", "EDD.*10", "SQUARES", "EDD.SQUARES"))
+print("#   {:17} {:>6} {:>6} {:>6} {:>6} {:>6}".format("NOM", "NB", "BBI", "BBI*10", "SQUARES", "BBI.SQUARES"))
 for user in sorted(users, key=lambda u: u['fill_count'], reverse=True):
     pos += 1
     print("{1:<2}: {0[name]:17} {0[fill_count]:>6} {0[eddington]:>6} {0[eddington10]:>6} {0[sum_maxsquare]:>6} {0[eddingtonSquare]:>6}".format(
