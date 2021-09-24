@@ -13,9 +13,6 @@ def get_statshunters_user_activities(path, sharelink, full=False):
         while os.path.exists(os.path.join(path, "activities_{}.json".format(page + 2))):
             page += 1
 
-
-
-
     last_activity = None
     while True:
         filepath = os.path.join(path, "activities_{}.json".format(page))

@@ -34,14 +34,35 @@ for user in users:
             zone_max_square = compute_max_square(outer_zones[zone] & explored_tiles)
             user['maxsquare'][zone] = zone_max_square
             user['sum_maxsquare'] += user['maxsquare'][zone]
+            user['rank'] = 1
 
     user['eddington'] = eddigton(user['fill'].values())
     user['eddington10'] = eddigton(user['fill'].values(), factor=10)
     user['eddingtonSquare'] = eddigton(user['maxsquare'].values())
 
+
 pos = 0
 print("#   {:17} {:>6} {:>6} {:>6} {:>6} {:>6}".format("NOM", "NB", "BBI", "BBI*10", "SQUARES", "BBI.SQUARES"))
-for user in sorted(users, key=lambda u: u['fill_count'], reverse=True):
+fields = ["fill_count", "eddington", "eddington10", "sum_maxsquare", "eddingtonSquare"]
+
+fields_results = {}
+for f in fields:
+    fields_results[f] = sorted([u[f] for u in users], reverse=True)
+    for user in users:
+        rank = fields_results[f].index(user[f])
+        user["rank_"+f] = rank + 1
+        user["rank"] += rank
+
+
+for user in sorted(users, key=lambda u: u['rank']):
     pos += 1
-    print("{1:<2}: {0[name]:17} {0[fill_count]:>6} {0[eddington]:>6} {0[eddington10]:>6} {0[sum_maxsquare]:>6} {0[eddingtonSquare]:>6}".format(
-            user, pos))
+    line = "{1:<3}: {0[name]:17}".format(user, user['rank'])
+    for f in fields:
+        if user[f]==max([u[f] for u in users]):
+            val = "*{}*".format(user[f])
+        else:
+            val = "{} ".format(user[f])
+        line += " {:>6}".format(val)
+    print(line)
+    #print("{1:<2}: {0[name]:17} {0[fill_count]:>6} {0[eddington]:>6} {0[eddington10]:>6} {0[sum_maxsquare]:>6} {0[eddingtonSquare]:>6}".format(
+            # user, pos))
