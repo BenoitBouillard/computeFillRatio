@@ -2,10 +2,10 @@ import os
 from pathlib import Path
 
 from common.config import load_users, GEN_USERS
-from common.zones import load_zones_outer
-from common.statshunters import tiles_from_activities
 from common.kmlutils import create_kml_for_tiles
 from common.squares import compute_max_square
+from common.statshunters import tiles_from_activities
+from common.zones import load_zones_outer
 
 outer_zones = load_zones_outer()
 users = load_users()

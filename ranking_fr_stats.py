@@ -1,7 +1,9 @@
-from common.config import load_users
-from common.zones import load_zones_outer
-from common.statshunters import tiles_from_activities
+import os
+
+from common.config import load_users, GEN_RESULTS
 from common.squares import compute_max_square
+from common.statshunters import tiles_from_activities
+from common.zones import load_zones_outer
 
 outer_zones = load_zones_outer("[0-9].*")
 users = load_users()
@@ -41,28 +43,29 @@ for user in users:
     user['eddingtonSquare'] = eddigton(user['maxsquare'].values())
 
 
-pos = 0
-print("#   {:17} {:>6} {:>6} {:>6} {:>6} {:>6}".format("NOM", "NB", "BBI", "BBI*10", "SQUARES", "BBI.SQUARES"))
-fields = ["fill_count", "eddington", "eddington10", "sum_maxsquare", "eddingtonSquare"]
+with open(os.path.join(GEN_RESULTS, 'ranking_fr_stats.txt'), 'w') as h:
+    pos = 0
+    header = "#   {:17} {:>6} {:>6} {:>6} {:>6} {:>6}".format("NOM", "NB", "BBI", "BBI*10", "SQUARES", "BBI.SQUARES")
+    print(header)
+    h.write(header+"\n")
 
-fields_results = {}
-for f in fields:
-    fields_results[f] = sorted([u[f] for u in users], reverse=True)
-    for user in users:
-        rank = fields_results[f].index(user[f])
-        user["rank_"+f] = rank + 1
-        user["rank"] += rank
-
-
-for user in sorted(users, key=lambda u: u['rank']):
-    pos += 1
-    line = "{1:<3}: {0[name]:17}".format(user, user['rank'])
+    fields = ["fill_count", "eddington", "eddington10", "sum_maxsquare", "eddingtonSquare"]
+    fields_results = {}
     for f in fields:
-        if user[f]==max([u[f] for u in users]):
-            val = "*{}*".format(user[f])
-        else:
-            val = "{} ".format(user[f])
-        line += " {:>6}".format(val)
-    print(line)
-    #print("{1:<2}: {0[name]:17} {0[fill_count]:>6} {0[eddington]:>6} {0[eddington10]:>6} {0[sum_maxsquare]:>6} {0[eddingtonSquare]:>6}".format(
-            # user, pos))
+        fields_results[f] = sorted([u[f] for u in users], reverse=True)
+        for user in users:
+            rank = fields_results[f].index(user[f])
+            user["rank_"+f] = rank + 1
+            user["rank"] += rank
+
+    for user in sorted(users, key=lambda u: u['rank']):
+        pos += 1
+        line = "{1:<3}: {0[name]:17}".format(user, user['rank'])
+        for f in fields:
+            if user[f]==max([u[f] for u in users]):
+                val = "*{}*".format(user[f])
+            else:
+                val = "{} ".format(user[f])
+            line += " {:>6}".format(val)
+        print(line)
+        h.write(line+"\n")

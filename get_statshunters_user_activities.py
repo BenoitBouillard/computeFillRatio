@@ -1,4 +1,5 @@
 import argparse
+
 from common.statshunters import get_statshunters_user_activities
 
 parser = argparse.ArgumentParser(description='Compute exploration ratio of a zone')

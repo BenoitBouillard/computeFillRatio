@@ -1,10 +1,9 @@
 from shapely.ops import unary_union
 
-from common.kmlutils import kml_file_from_polygons
-from common.config import *
 from common import statshunters, zones
+from common.config import *
+from common.kmlutils import kml_file_from_polygons
 from common.tile import Tile
-
 
 users = load_users()
 config = load_config()

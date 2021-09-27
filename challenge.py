@@ -1,11 +1,11 @@
 import argparse
 import os
 import re
-from datetime import datetime
 from collections import OrderedDict
+from datetime import datetime
 
 from common import statshunters
-from common.config import load_users, load_config
+from common.config import load_users, load_config, GEN_RESULTS
 from common.squares import compute_max_square, compute_cluster
 
 # FIELDS = ['square', 'cluster', 'tiles', 'activities', 'useful_ac', 'unique_tiles']
@@ -100,49 +100,53 @@ def compute_challenges(challenge_str=None, index=None):
                         users_results[userName][field + "_diff"] = users_results[userName][field] - \
                                                                    users_results_prev[userName][field]
 
-        if compare:
-            format_str = "{0:<2} {2:>4} {1:<16}"
-        else:
-            format_str = "{0:<2} {1:<16}"
+        with open(os.path.join(GEN_RESULTS, 'challenges_{}_{}.txt'.format(challenge, index)), 'w') as h:
 
-        header = format_str.format("##", "Name", "Diff")
-
-        for sf in sort_fields:
             if compare:
-                header += " {:^11}".format(sf)
+                format_str = "{0:<2} {2:>4} {1:<16}"
             else:
-                line = " {:>5}".format(sf)
-                line += " " * (11 - len(line))
-                header += line
+                format_str = "{0:<2} {1:<16}"
 
-        print(header)
-
-        rank = 1
-        for user, result in users_results.items():
-            if compare:
-                line_str = format_str.format(result['rank'], result['user'], "({:+2})".format(result["rank_diff"]))
-            else:
-                line_str = format_str.format(result['rank'], result['user'], "")
+            header = format_str.format("##", "Name", "Diff")
 
             for sf in sort_fields:
-                if result[sf] is None:
-                    line = "   ???"
-                    if compare:
-                        line += "     "
+                if compare:
+                    header += " {:^11}".format(sf)
                 else:
-                    line = " {:>5.0f}".format(result[sf])
-                    if compare:
-                        p = "({:+4.0f})".format(result[sf + "_diff"])
-                        if len(p) < 6:
-                            p += " " * (6 - len(p))
-                        line += p
+                    line = " {:>5}".format(sf)
+                    line += " " * (11 - len(line))
+                    header += line
+
+            print(header)
+            h.write(header+"\n")
+
+            rank = 1
+            for user, result in users_results.items():
+                if compare:
+                    line_str = format_str.format(result['rank'], result['user'], "({:+2})".format(result["rank_diff"]))
+                else:
+                    line_str = format_str.format(result['rank'], result['user'], "")
+
+                for sf in sort_fields:
+                    if result[sf] is None:
+                        line = "   ???"
+                        if compare:
+                            line += "     "
                     else:
-                        line += "     "
+                        line = " {:>5.0f}".format(result[sf])
+                        if compare:
+                            p = "({:+4.0f})".format(result[sf + "_diff"])
+                            if len(p) < 6:
+                                p += " " * (6 - len(p))
+                            line += p
+                        else:
+                            line += "     "
 
-                line_str += line
+                    line_str += line
 
-            print(line_str)
-            rank += 1
+                print(line_str)
+                h.write(line_str+"\n")
+                rank += 1
 
 
 if __name__ == '__main__':

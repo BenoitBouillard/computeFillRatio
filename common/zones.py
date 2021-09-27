@@ -1,6 +1,7 @@
 import json
-from common import config
 import re
+
+from common import config
 
 
 def load_zones(file, re_filter=None):

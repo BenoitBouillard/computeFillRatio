@@ -1,5 +1,6 @@
-from shapely.geometry import Polygon
 import math
+
+from shapely.geometry import Polygon
 
 coords_tile = dict()
 

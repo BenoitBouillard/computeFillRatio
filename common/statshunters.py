@@ -1,7 +1,8 @@
-import os
-from common import config
 import json
+import os
 from pathlib import Path
+
+from common import config
 from common.urlutils import my_urlretrieve
 
 

@@ -1,6 +1,6 @@
-from urllib.request import urlretrieve
 import time
 from functools import wraps
+from urllib.request import urlretrieve
 
 
 def retry(exception_to_check, tries=4, delay=3, backoff=2, logger=None):

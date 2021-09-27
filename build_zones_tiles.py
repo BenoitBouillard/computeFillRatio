@@ -1,6 +1,6 @@
 from common.config import *
-from common.kmlutils import kml_zone_to_tiles
 from common.config import GEN_PATH
+from common.kmlutils import kml_zone_to_tiles
 
 if __name__ == '__main__':
     config = load_config()

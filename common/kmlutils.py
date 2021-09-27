@@ -1,7 +1,9 @@
+from collections import Iterable
+
 from fastkml import kml
 from shapely.geometry import Polygon
+
 from common.tile import tile_from_coord, Tile
-from collections import Iterable
 
 
 def kml_zone_to_tiles(kml_file):

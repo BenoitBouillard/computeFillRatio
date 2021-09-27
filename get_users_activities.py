@@ -1,8 +1,9 @@
-import os
 import argparse
-from common.statshunters import get_statshunters_user_activities
+import os
+
 from common.config import load_users, GEN_USER_DATA
-from pprint import pprint
+from common.statshunters import get_statshunters_user_activities
+
 
 def get_users_activities(full=True, name=None):
     users = load_users()

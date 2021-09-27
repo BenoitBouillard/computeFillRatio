@@ -1,5 +1,7 @@
-from fastkml import kml
 import os
+
+from fastkml import kml
+
 from common.config import GEN_ZONES
 
 

@@ -1,8 +1,9 @@
-from fill_ratio import compute_fill_ratio
+import os
 
-from common.config import load_users
-from common.zones import load_zones_outer
+from common.config import load_users, GEN_RESULTS
 from common.statshunters import tiles_from_activities
+from common.zones import load_zones_outer
+from fill_ratio import compute_fill_ratio
 
 users = load_users()
 outer_zones = load_zones_outer()
@@ -27,13 +28,19 @@ for user in users:
 
 pos = 0
 full = ""
-print("#   {:35} {:4}".format("NOM", "RATIO"))
-for user in sorted(user_zones, key=lambda u: u['ratio'], reverse=True):
-    if user['ratio'] < 1:
-        pos += 1
-        print("{1:<2}: {0[namedep]:35} {0[ratio]:>5.1%} ({0[explored_tile_count]:5} / {0[zone_tiles_count]:5} )".format(
-            user, pos))
-    else:
-        full += "{0[name]} {0[zone]}({0[zone_tiles_count]}) / ".format(user)
-if full:
-    print("8) " + full[:-2])
+with open(os.path.join(GEN_RESULTS, 'ranking_fill_zones.txt'), 'w') as h:
+    print("#   {:35} {:4}".format("NOM", "RATIO"))
+    h.write("#   {:35} {:4}\n".format("NOM", "RATIO"))
+    for user in sorted(user_zones, key=lambda u: u['ratio'], reverse=True):
+        if user['ratio'] < 1:
+            pos += 1
+            print("{1:<2}: {0[namedep]:35} {0[ratio]:>5.1%} ({0[explored_tile_count]:5} / {0[zone_tiles_count]:5} )".format(
+                user, pos))
+            h.write(
+                "{1:<2}: {0[namedep]:35} {0[ratio]:>5.1%} ({0[explored_tile_count]:5} / {0[zone_tiles_count]:5} )\n".format(
+                    user, pos))
+        else:
+            full += "{0[name]} {0[zone]}({0[zone_tiles_count]}) / ".format(user)
+    if full:
+        print("8) " + full[:-2])
+        h.write("8) " + full[:-2]+"\n")

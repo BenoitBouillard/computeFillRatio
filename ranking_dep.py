@@ -1,9 +1,7 @@
-from fill_ratio import compute_fill_ratio
-
 from common.config import load_users
-from common.zones import load_zones_outer
 from common.statshunters import tiles_from_activities
-
+from common.zones import load_zones_outer
+from fill_ratio import compute_fill_ratio
 
 users = load_users()
 outer_zones = load_zones_outer("[0-9].*")

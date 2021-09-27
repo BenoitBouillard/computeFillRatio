@@ -13,11 +13,13 @@ GEN_USER_DATA = os.path.join(GEN_PATH, 'data')
 GEN_USERS = os.path.join(GEN_PATH, 'users')
 GEN_ZONES = os.path.join(GEN_PATH, 'zones')
 GEN_ZONES_TILES = os.path.join(GEN_PATH, 'zones_tiles')
+GEN_RESULTS = os.path.join(GEN_USERS, '_RESULTS')
 
 Path(GEN_USER_DATA).mkdir(exist_ok=True, parents=True)
 Path(GEN_USERS).mkdir(exist_ok=True, parents=True)
 Path(GEN_ZONES).mkdir(exist_ok=True, parents=True)
 Path(GEN_ZONES_TILES).mkdir(exist_ok=True, parents=True)
+Path(GEN_RESULTS).mkdir(exist_ok=True, parents=True)
 
 
 def load_users(only_url=True):
