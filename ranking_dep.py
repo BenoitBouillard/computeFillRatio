@@ -1,7 +1,10 @@
-from common.config import load_users
+import os
+
+from common.config import load_users, GEN_RESULTS
 from common.statshunters import tiles_from_activities
 from common.zones import load_zones_outer
 from fill_ratio import compute_fill_ratio
+from common.fileutils import FileCheck
 
 users = load_users()
 outer_zones = load_zones_outer("[0-9].*")
@@ -23,9 +26,11 @@ for user in users:
             }
             zones_results[zone].append(user_zone)
 
-for zone in zones_results:
-    zones_results[zone].sort(key=lambda r:r['explored_tile_count'], reverse=True)
-    line = "{:<4}: ".format(zone)
-    for res in zones_results[zone][0:3]:
-        line += "({:>3.0f}%) {:<17} ".format(res["ratio"]*100, res["name"])
-    print(line)
+with FileCheck(os.path.join(GEN_RESULTS, "ranking_fr_dep.txt")) as h:
+    for zone in zones_results:
+        zones_results[zone].sort(key=lambda r:r['explored_tile_count'], reverse=True)
+        line = "{:<4}: ".format(zone)
+        for res in zones_results[zone][0:3]:
+            line += "({:>3.0f}%) {:<17} ".format(res["ratio"]*100, res["name"])
+        print(line)
+        h.write(line+'\n')

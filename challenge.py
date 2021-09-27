@@ -3,6 +3,7 @@ import os
 import re
 from collections import OrderedDict
 from datetime import datetime
+from pathlib import Path
 
 from common import statshunters
 from common.config import load_users, load_config, GEN_RESULTS
@@ -11,6 +12,9 @@ from common.fileutils import FileCheck
 
 # FIELDS = ['square', 'cluster', 'tiles', 'activities', 'useful_ac', 'unique_tiles']
 FIELDS = ['square', 'cluster', 'tiles', 'activities']
+
+GEN_CHALLENGES = os.path.join(GEN_RESULTS, 'challenges')
+Path(GEN_CHALLENGES).mkdir(exist_ok=True, parents=True)
 
 
 def compute_challenges(challenge_str=None, index=None):
@@ -101,7 +105,10 @@ def compute_challenges(challenge_str=None, index=None):
                         users_results[userName][field + "_diff"] = users_results[userName][field] - \
                                                                    users_results_prev[userName][field]
 
-        with FileCheck(os.path.join(GEN_RESULTS, 'challenges_{}_{}.txt'.format(challenge, index))) as h:
+        gen_challenge = os.path.join(GEN_CHALLENGES, challenge)
+        Path(gen_challenge).mkdir(exist_ok=True, parents=True)
+
+        with FileCheck(os.path.join(gen_challenge, '{}_{:02}.txt'.format(challenge, index))) as h:
 
             if compare:
                 format_str = "{0:<2} {2:>4} {1:<16}"

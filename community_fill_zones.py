@@ -1,7 +1,9 @@
+import os
+
 from shapely.ops import unary_union
 
 from common import statshunters, zones
-from common.config import *
+from common.config import GEN_RESULTS, load_config, load_users
 from common.kmlutils import kml_file_from_polygons
 from common.tile import Tile
 from common.fileutils import FileCheck
@@ -24,7 +26,7 @@ for user in users:
 
 geom_z = unary_union(geoms_users)
 
-output_file = os.path.join(GEN_USERS, "kikourou_tiles.kml")
+output_file = os.path.join(GEN_RESULTS, "kikourou_tiles.kml")
 if output_file:
     kml_file_from_polygons(geom_z, output_file)
 
@@ -53,9 +55,9 @@ for country in config['countries']:
         report += "{0[0]:<9} : {0[3]:>6.2f}% ({0[1]:>5}/{0[2]:>5})\n".format(zone)
     report += "\n"
 
-with FileCheck(os.path.join(GEN_USERS, 'countries_report.txt')) as hF:
+with FileCheck(os.path.join(GEN_RESULTS, 'countries_report.txt')) as hF:
     hF.write(report)
 
-with FileCheck(os.path.join(GEN_USERS, 'countries_report.csv')) as hF:
+with FileCheck(os.path.join(GEN_RESULTS, 'countries_report.csv')) as hF:
     hF.write(db_report)
 
