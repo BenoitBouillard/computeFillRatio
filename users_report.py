@@ -6,6 +6,7 @@ from common.kmlutils import create_kml_for_tiles
 from common.squares import compute_max_square
 from common.statshunters import tiles_from_activities
 from common.zones import load_zones_outer
+from common.fileutils import FileCheck
 
 outer_zones = load_zones_outer()
 users = load_users()
@@ -39,5 +40,5 @@ for user in users:
         report = ""
         for dep in sorted(dep_explorer, key=lambda x: x[1], reverse=True):
             report += "{0[0]:10} fill: {0[1]:>5.1%} ({0[2]:>5} / {0[3]:>5} ) max square: {0[4]:>3}\n".format(dep, )
-        with open(os.path.join(gen_path, "report {}.txt".format(user['name'])), "w") as hF:
+        with FileCheck(os.path.join(gen_path, "report {}.txt".format(user['name']))) as hF:
             hF.write(report)

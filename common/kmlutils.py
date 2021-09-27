@@ -4,6 +4,7 @@ from fastkml import kml
 from shapely.geometry import Polygon
 
 from common.tile import tile_from_coord, Tile
+from common.fileutils import FileCheck
 
 
 def kml_zone_to_tiles(kml_file):
@@ -81,7 +82,7 @@ def kml_file_from_polygons(polygons, kml_file):
         p.geometry = polygon
         f2.append(p)
 
-    with open(kml_file, 'w') as myfile:
+    with FileCheck(kml_file) as myfile:
         myfile.write(k.to_string(prettyprint=True))
 
 

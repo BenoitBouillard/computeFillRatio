@@ -4,6 +4,7 @@ from common.config import load_users, GEN_RESULTS
 from common.squares import compute_max_square
 from common.statshunters import tiles_from_activities
 from common.zones import load_zones_outer
+from common.fileutils import FileCheck
 
 outer_zones = load_zones_outer("[0-9].*")
 users = load_users()
@@ -43,7 +44,7 @@ for user in users:
     user['eddingtonSquare'] = eddigton(user['maxsquare'].values())
 
 
-with open(os.path.join(GEN_RESULTS, 'ranking_fr_stats.txt'), 'w') as h:
+with FileCheck(os.path.join(GEN_RESULTS, 'ranking_fr_stats.txt')) as h:
     pos = 0
     header = "#   {:17} {:>6} {:>6} {:>6} {:>6} {:>6}".format("NOM", "NB", "BBI", "BBI*10", "SQUARES", "BBI.SQUARES")
     print(header)

@@ -4,6 +4,7 @@ from common import statshunters, zones
 from common.config import *
 from common.kmlutils import kml_file_from_polygons
 from common.tile import Tile
+from common.fileutils import FileCheck
 
 users = load_users()
 config = load_config()
@@ -52,9 +53,9 @@ for country in config['countries']:
         report += "{0[0]:<9} : {0[3]:>6.2f}% ({0[1]:>5}/{0[2]:>5})\n".format(zone)
     report += "\n"
 
-with open(os.path.join(GEN_USERS, 'countries_report.txt'), "w") as hF:
+with FileCheck(os.path.join(GEN_USERS, 'countries_report.txt')) as hF:
     hF.write(report)
 
-with open(os.path.join(GEN_USERS, 'countries_report.csv'), "w") as hF:
+with FileCheck(os.path.join(GEN_USERS, 'countries_report.csv')) as hF:
     hF.write(db_report)
 

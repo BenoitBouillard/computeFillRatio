@@ -7,6 +7,7 @@ from datetime import datetime
 from common import statshunters
 from common.config import load_users, load_config, GEN_RESULTS
 from common.squares import compute_max_square, compute_cluster
+from common.fileutils import FileCheck
 
 # FIELDS = ['square', 'cluster', 'tiles', 'activities', 'useful_ac', 'unique_tiles']
 FIELDS = ['square', 'cluster', 'tiles', 'activities']
@@ -100,7 +101,7 @@ def compute_challenges(challenge_str=None, index=None):
                         users_results[userName][field + "_diff"] = users_results[userName][field] - \
                                                                    users_results_prev[userName][field]
 
-        with open(os.path.join(GEN_RESULTS, 'challenges_{}_{}.txt'.format(challenge, index)), 'w') as h:
+        with FileCheck(os.path.join(GEN_RESULTS, 'challenges_{}_{}.txt'.format(challenge, index))) as h:
 
             if compare:
                 format_str = "{0:<2} {2:>4} {1:<16}"
