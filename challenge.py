@@ -83,7 +83,7 @@ def compute_challenges(challenge_str=None, index=None):
                     'useful_ac': useful_activities_count,
                     'unique_tiles': len(unique_tiles),
                 }
-            results = OrderedDict(sorted(results.items(), key=lambda kvp: tuple([kvp[1][f] for f in sort_fields]), reverse=True))
+            results = OrderedDict(sorted(results.items(), key=lambda kvp: tuple([kvp[1][f] for f in sort_fields if kvp[1][f] is not None]), reverse=True))
             rank = 1
             for user, result in results.items():
                 result['rank'] = rank
