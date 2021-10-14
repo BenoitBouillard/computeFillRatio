@@ -9,6 +9,7 @@ from common import statshunters
 from common.config import load_users, load_config, GEN_RESULTS
 from common.squares import compute_max_square, compute_cluster
 from common.fileutils import FileCheck
+from gen_unvisited import gen_kml_unvisited
 
 # FIELDS = ['square', 'cluster', 'tiles', 'activities', 'useful_ac', 'unique_tiles']
 FIELDS = ['square', 'cluster', 'tiles', 'activities']
@@ -82,6 +83,7 @@ def compute_challenges(challenge_str=None, index=None):
                     'cluster': compute_cluster(tiles),
                     'useful_ac': useful_activities_count,
                     'unique_tiles': len(unique_tiles),
+                    'tiles_set': tiles
                 }
             results = OrderedDict(sorted(results.items(), key=lambda kvp: tuple([kvp[1][f] or 0 for f in sort_fields]), reverse=True))
             rank = 1
@@ -130,6 +132,11 @@ def compute_challenges(challenge_str=None, index=None):
 
             rank = 1
             for user, result in users_results.items():
+                kml_file_name = os.path.join(gen_challenge, "{0}_{1}_unvisited.kml".format(challenge, result['user']))
+
+                if 'tiles_set' in result and result['cluster']>0:
+                    with FileCheck(kml_file_name) as hkml:
+                        hkml.write(gen_kml_unvisited(result['tiles_set'], 14).to_string())
                 if compare:
                     line_str = format_str.format(result['rank'], result['user'], "({:+2})".format(result["rank_diff"]))
                 else:

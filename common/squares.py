@@ -59,3 +59,43 @@ def compute_cluster(tiles):
         return 0
     zones = compute_zones(cluster_tiles)
     return max([len(c) for c in zones])
+
+
+def compute_clusters(tiles):
+    if isinstance(list(tiles)[0], str):
+        tiles = set([tuple([int(i) for i in t.split('_')]) for t in tiles])
+    tiles_d = {}
+    for (x, y) in tiles:
+        if x not in tiles_d:
+            tiles_d[x] = set()
+        tiles_d[x].add(y)
+    cluster_tiles = set()
+    for (x, y) in tiles:
+        for dx, dy in adjoining:
+            if x + dx not in tiles_d:
+                break
+            if y + dy not in tiles_d[x + dx]:
+                break
+        else:
+            cluster_tiles.add((x, y))
+    return compute_zones(cluster_tiles)
+
+
+def compute_max_cluster(tiles):
+    zones = compute_clusters(tiles)
+    return zones[0]
+
+
+def expand_cluster(cluster, limit):
+    expansion = set(cluster)
+    frontier = set(cluster)
+    for n in range(limit):
+        new_frontier = set()
+        for x, y in frontier:
+            for dx, dy in adjoining:
+                if (x + dx, y + dy) not in expansion:
+                    new_frontier.add((x + dx, y + dy))
+                    expansion.add((x + dx, y + dy))
+        frontier = new_frontier
+    return expansion
+
