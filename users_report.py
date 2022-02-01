@@ -10,15 +10,6 @@ from common.fileutils import FileCheck
 
 outer_zones = load_zones_outer()
 users = load_users()
-users = [
-{
-    "name" : "Ludovic_P",
-    "url"  : "https://www.statshunters.com/share/cc8871d9350b",
-    "zones" : [ "42", "69", "CH-GE" ],
-    "challenges": ["Y2021_Run", "Y2021_Ride", "2021_Run", "2021_Ride", "2021_RunFromHome"],
-    "stravaName" : "Ludovic Péron"
-  }
-]
 
 print("Generate reports in", GEN_USERS)
 
