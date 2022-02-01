@@ -36,7 +36,13 @@ def compute_challenges(challenge_str=None, index=None):
         challenge_config = config['challenges'][challenge]
         activity_types = config['activity_types_equiv'][challenge_config['activity_type']]
 
-        users = list(filter(lambda u: challenge_config.get('user_default', False) or challenge in u.get('challenges', []), users_json))
+        def check_chalenges(challenge_str, challenges_user):
+            for cu in challenges_user:
+                if re.match(cu, challenge_str):
+                    return True
+            return False
+
+        users = list(filter(lambda u: challenge_config.get('user_default', False) or check_chalenges(challenge, u.get('challenges', [])), users_json))
 
         compare = challenge_config.get('compare', False)
         if not isinstance(compare, bool):

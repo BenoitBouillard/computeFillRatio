@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="SHC 2021 ALL" type="PythonConfigurationType" factoryName="Python">
+  <configuration default="false" name="SHC 2022 ALL" type="PythonConfigurationType" factoryName="Python">
     <module name="computeFillRatio" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
@@ -12,7 +12,7 @@
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <option name="SCRIPT_NAME" value="challenge.py" />
-    <option name="PARAMETERS" value="-c 2021 -i 10" />
+    <option name="PARAMETERS" value="-c 2022 -i 1" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />

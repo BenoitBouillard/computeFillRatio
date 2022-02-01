@@ -1,7 +1,9 @@
 from collections import Iterable
 
 from fastkml import kml
+from shapely import geometry
 from shapely.geometry import Polygon
+import geojson
 
 from common.tile import tile_from_coord, Tile
 from common.fileutils import FileCheck
@@ -88,3 +90,15 @@ def kml_file_from_polygons(polygons, kml_file):
 
 def create_kml_for_tiles(tiles, kml_file):
     kml_file_from_polygons([Tile(x, y).polygon for (x, y) in tiles], kml_file)
+
+
+def shapely_to_geojson(shape):
+    if isinstance(shape, geometry.Polygon):
+        return geojson.Polygon([list(shape.exterior.coords), *[list(x.coords) for x in shape.interiors]])
+    if isinstance(shape, geometry.MultiPolygon):
+        return geojson.MultiPolygon([shapely_to_geojson(p) for p in shape])
+    if shape.is_empty:
+        return geojson.MultiPolygon()
+    raise Exception("Not manage", shape)
+
+

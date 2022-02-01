@@ -5,15 +5,16 @@ from pathlib import Path
 USERS_CONFIG_FILE = "users.json"
 CONFIG_FILE = "config.json"
 
-GEN_PATH = os.path.join(Path.home(), 'tiles-stats')
+GEN_PATH = os.path.join('gen')
+GEN_PUBLIC_PATH = os.path.join('static/gen')
 
 GEN_TILES_ZONES_INNER = os.path.join(GEN_PATH, "zones_inner_tiles.json")
 GEN_TILES_ZONES_OUTER = os.path.join(GEN_PATH, "zones_outer_tiles.json")
 GEN_USER_DATA = os.path.join(GEN_PATH, 'data')
-GEN_USERS = os.path.join(GEN_PATH, 'users')
-GEN_ZONES = os.path.join(GEN_PATH, 'zones')
-GEN_ZONES_TILES = os.path.join(GEN_PATH, 'zones_tiles')
-GEN_RESULTS = os.path.join(GEN_PATH, 'results')
+GEN_USERS = os.path.join(GEN_PUBLIC_PATH, 'users')
+GEN_ZONES = os.path.join(GEN_PUBLIC_PATH, 'zones')
+GEN_ZONES_TILES = os.path.join(GEN_PUBLIC_PATH, 'zones_tiles')
+GEN_RESULTS = os.path.join(GEN_PUBLIC_PATH, 'results')
 
 Path(GEN_USER_DATA).mkdir(exist_ok=True, parents=True)
 Path(GEN_USERS).mkdir(exist_ok=True, parents=True)

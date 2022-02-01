@@ -1,10 +1,11 @@
 import os
 
 from shapely.ops import unary_union
+import geojson
 
 from common import statshunters, zones
 from common.config import GEN_RESULTS, load_config, load_users
-from common.kmlutils import kml_file_from_polygons
+from common.kmlutils import kml_file_from_polygons, shapely_to_geojson
 from common.tile import Tile
 from common.fileutils import FileCheck
 
@@ -29,6 +30,8 @@ geom_z = unary_union(geoms_users)
 output_file = os.path.join(GEN_RESULTS, "kikourou_tiles.kml")
 if output_file:
     kml_file_from_polygons(geom_z, output_file)
+    with open(output_file[:-3]+"geojson", "w") as h:
+        h.write(geojson.dumps(shapely_to_geojson(geom_z)))
 
 report = ""
 db_report = ""

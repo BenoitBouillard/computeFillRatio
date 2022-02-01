@@ -8,7 +8,7 @@ if __name__ == '__main__':
     inner_zones = {}
     outer_zones = {}
     for zone in config['zones']:
-        path = config['zones'][zone].replace("%GEN_PATH%", GEN_PATH)
+        path = config['zones'][zone].replace("%GEN_ZONES%", GEN_ZONES)
         inner_tiles, outer_tiles = kml_zone_to_tiles(path)
         inner_zones[zone] = list(inner_tiles)
         outer_zones[zone] = list(outer_tiles)

@@ -1,2 +1,5 @@
-fastkml
-shapely
+fastkml~=0.11
+shapely~=1.7.1
+
+geojson~=2.5.0
+urllib3~=1.26.6
