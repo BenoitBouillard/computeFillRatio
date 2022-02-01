@@ -10,7 +10,7 @@
         "sort" : ["tiles", "cluster", "square"],
         "compare": "index>1",
         "filter" : [
-            "datetime.fromisoformat(activity['date']) >= datetime(2021 + int(index/12), 1+(index%12), 1)",
+            "datetime.fromisoformat(activity['date']) >= datetime(2022, 1, 1)",
             "datetime.fromisoformat(activity['date']) < datetime(2022 + int(index/12), 1+(index%12), 1)"
         ]
     },
@@ -19,7 +19,7 @@
         "sort" : ["tiles", "cluster", "square"],
         "compare": "index>1",
         "filter" : [
-            "datetime.fromisoformat(activity['date']) >= datetime(2021 + int(index/12), 1+(index%12), 1)",
+            "datetime.fromisoformat(activity['date']) >= datetime(2022, 1, 1)",
             "datetime.fromisoformat(activity['date']) < datetime(2022 + int(index/12), 1+(index%12), 1)"
         ]
     },
