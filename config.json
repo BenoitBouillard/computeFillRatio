@@ -23,6 +23,15 @@
             "datetime.fromisoformat(activity['date']) < datetime(2022 + int(index/12), 1+(index%12), 1)"
         ]
     },
+    "2022_All" : {
+        "activity_type" : "All",
+        "sort" : ["tiles", "cluster", "square"],
+        "compare": "index>1",
+        "filter" : [
+            "datetime.fromisoformat(activity['date']) >= datetime(2022, 1, 1)",
+            "datetime.fromisoformat(activity['date']) < datetime(2022 + int(index/12), 1+(index%12), 1)"
+        ]
+    },
     "2021_Run" : {
         "activity_type" : "Run",
         "sort" : ["cluster", "square"],
