@@ -1,0 +1,103 @@
+html {
+    height:100%;
+    padding: 0;
+    margin: 0;
+    font-size: 13px;
+}
+
+body {
+    background-color: #FFFFDF;
+    font-family: verdana,arial,serif;
+    /*font-size: 11px;
+    line-height: 1.2;*/
+    padding: 0px;
+    margin: 0px;
+    height: 100%;
+}
+
+.ribbon {
+    position: relative;
+    overflow: hidden;
+    padding-left: 10px;
+}
+
+.navbar {
+    padding:0;
+}
+
+.main {
+    margin: 2px 4px 4px 2px;
+    padding: 0px;
+    box-shadow: 3px 6px 6px -3px #30313f;
+    -webkit-box-shadow: 3px 6px 6px -3px #30313f;
+    border: 4px #fffcf5 solid;
+    border-radius: 0px 0px 4px 4px;
+    -moz-border-radius: 0px 0px 4px 4px;
+    -webkit-border-radius: 0px 0px 4px 4px;
+    background-color: #fffcf5;
+}
+
+.content {
+    background: #fffcf5;
+    padding: 0;
+    text-align: left;
+    min-height: 200px;
+    user-select: none;
+}
+
+a {
+    color: #CC6633;
+}
+
+h2 {
+    font-weight: normal;
+    color: #CC6633;
+    font-size: 1.5em;
+    margin: 0;
+}
+
+.container label {
+    width:100%
+}
+.container button {
+    width:100%
+}
+
+/* Don't show hover */
+.btn-outline-primary:hover {
+    color: #0d6efd;
+    background-color: #fff;
+}
+
+.btn-check:checked+.btn-outline-primary:hover {
+    color: #fff;
+    background-color: #0d6efd;
+}
+
+.btn-outline-info:hover {
+    color: #0dcaf0;
+    background-color: #fff;
+}
+
+.btn-check:checked+.btn-outline-info:hover {
+    color: black;
+    background-color: #0dcaf0;
+}
+
+.btn>i.bi {
+    font-size:1.5em;
+}
+
+
+.modal-bottom {
+    bottom: 0;
+    top: auto;
+    position: fixed;
+    left: 0;
+    right: 0;
+}
+
+.modal.fade-bottom .modal-dialog {
+    transition: transform .3s ease-out;
+    transform: translate(0,0);
+}
