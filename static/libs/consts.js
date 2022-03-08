@@ -109,7 +109,7 @@ export const styles = {
             name: "carrés",
             weight : 2,
             opacity: 0.4,
-            fillOpacity : 0.15,
+            fillOpacity : 0.25,
             color : "blue"
         },
         unvisited: {

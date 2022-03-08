@@ -170,7 +170,10 @@ $(document).ready(function(){
         var geojson;
 
         styles.tiles.style = function(feature) {
-            return styles.tiles[feature.properties.kind]
+            if (feature.properties.kind in styles.tiles)
+                return styles.tiles[feature.properties.kind]
+            else
+                return styles.tiles["tiles"]
         }
 
         function squadrats_display(data) {
