@@ -76,6 +76,7 @@ $(document).ready(function(){
       success: function(data) {
         ranking_data = data
         load_table()
+        sort_table($('th[data-sort][data-sorted="true').index())
       }
     })
 
@@ -188,7 +189,4 @@ $(document).ready(function(){
         }
     });
 
-    $("#erase-storage").on("click", function() {
-        localStorage.clear();
-    })
 })

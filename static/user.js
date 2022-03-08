@@ -6,8 +6,9 @@ $(document).ready(function(){
         const queryString = window.location.search
         const urlParams = new URLSearchParams(queryString);
         user_name = urlParams.get('user')
-        $('#name').text(user_name)
+        $('span[data-replace="name"]').text(user_name)
         document.title = "[x] "+ user_name
+        $("#user_map_link").attr("href", "map.html?user="+user_name)
     }
 
     var ranking_data = null;
@@ -16,7 +17,7 @@ $(document).ready(function(){
         var select = $('input[name="btnradio"]:checked').val()
         function get_val(user, item) {
             if (item=="ratio") {
-                return (100.0*user["visited"]/user["total"]).toFixed(2)
+                return parseFloat((100.0*user["visited"]/user["total"]).toFixed(2))
             }
             /*if (item=="last_activity") {
                 return user['last_activity']
@@ -89,6 +90,7 @@ $(document).ready(function(){
       success: function(data) {
         ranking_data = data[user_name].zones
         load_table()
+        sort_table($('th[data-sort][data-sorted="true').index())
       }
     })
 
@@ -201,7 +203,4 @@ $(document).ready(function(){
         }
     });
 
-    $("#erase-storage").on("click", function() {
-        localStorage.clear();
-    })
 })

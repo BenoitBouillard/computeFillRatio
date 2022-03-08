@@ -16,7 +16,7 @@ class FileCheck:
             with open(self.path, 'r', encoding=self.encoding) as hr:
                 actual = hr.read()
                 if self.buffer.getvalue() == actual:
-                    print("File '{}' has not changed".format(self.path))
+                    # print("File '{}' has not changed".format(self.path))
                     return
         with open(self.path, 'w', encoding=self.encoding) as hr:
             hr.write(self.buffer.getvalue())

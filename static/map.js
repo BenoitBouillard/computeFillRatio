@@ -41,14 +41,16 @@ $(document).ready(function(){
         if (user) {
             if (zone) {
                 geojson_file = "gen/users/" + user + "/" + user+ "_" + zone + ".geojson";
+                document.title = "[x] "+ user + " (" + zone + ")"
             } else {
                 geojson_file = "gen/users/" + user + "/" + user + ".geojson";
+                document.title = "[x] carte "+ user
             }
-
+        } else {
+            document.title = "[x] carte Kikourou"
         }
 
         $('#name').text(user)
-        document.title = "[x] "+ user + " " + zone
     }
 
 
