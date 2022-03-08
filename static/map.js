@@ -1,3 +1,4 @@
+import {styles, consts} from "./libs/consts.js?version=1.4"
 
 // ############ MAP SIZE ############
 {
@@ -29,11 +30,37 @@
 $(document).ready(function(){
 
     // ############ USER NAME ############
+    var user = false;
+    var zone = false;
+    var geojson_file = "gen/results/kikourou_tiles.geojson";
+    {
+        const queryString = window.location.search
+        const urlParams = new URLSearchParams(queryString);
+        user = urlParams.get('user')
+        zone = urlParams.get('zone')
+        if (user) {
+            if (zone) {
+                geojson_file = "gen/users/" + user + "/" + user+ "_" + zone + ".geojson";
+            } else {
+                geojson_file = "gen/users/" + user + "/" + user + ".geojson";
+            }
+
+        }
+
+        $('#name').text(user)
+        document.title = "[x] "+ user + " " + zone
+    }
 
 
 
     // ############ MAP ############
     var mymap = L.map('content', {zoomSnap: 0.5, zoomDelta:0.5, attributionControl: false});
+
+    // Create panes to add layers on the right z-index
+    $.each(consts.panes, function(i, pane) {
+        mymap.createPane(pane.name);
+        mymap.getPane(pane.name).style.zIndex = pane.zIndex;
+    })
 
     // ############ SAVE MAP ZOOM & CENTER ############
     {
@@ -48,55 +75,6 @@ $(document).ready(function(){
 
     // ############ MAP LAYERS ############
     {
-    var baseLayers =[
-       {
-            name: "OSM Fr",
-            maxZoom: 19,
-            attribution: false,
-            url: 'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'
-        },
-        {
-            name: "IGN carte",
-            url: 'https://wxs.ign.fr/{apikey}/geoportail/wmts?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&STYLE={style}&TILEMATRIXSET=PM&FORMAT={format}&LAYER={layer}&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}',
-            attribution: false,
-            maxZoom: 19,
-            apikey: 'choisirgeoportail',
-            layer: 'GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2',
-            format: 'image/png',
-            style: 'normal'
-        },
-        {
-            name: "IGN Sat.",
-            url: 'https://wxs.ign.fr/{apikey}/geoportail/wmts?service=WMTS&request=GetTile&version=1.0.0&tilematrixset=PM&tilematrix={z}&tilecol={x}&tilerow={y}&layer=ORTHOIMAGERY.ORTHOPHOTOS&format=image/jpeg&style=normal',
-            attribution: false,
-            maxZoom: 19,
-            apikey: 'choisirgeoportail',
-            format: 'image/jpeg',
-            style: 'normal'
-        },
-        {
-            name: "ESRI Sat.",
-            url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-            attribution: false,
-            maxZoom: 19
-        },
-        {
-            name: "Google Sat.",
-            url: 'http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
-            subdomains:['mt0','mt1','mt2','mt3'],
-            attribution: false,
-            maxZoom: 20
-        },
-        {
-            name: "Google Hybrid",
-            url: 'http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',
-            subdomains:['mt0','mt1','mt2','mt3'],
-            attribution: false,
-            maxZoom: 20
-        }
-    ]
-
-
         // TILES SOURCES
         var layers_name = []
         var tile_layers = {}
@@ -104,7 +82,7 @@ $(document).ready(function(){
         function load_layers() {
             layers_name = []
             tile_layers = {}
-            baseLayers.forEach(layer => {
+            consts.baseLayers.forEach(layer => {
                 layers_name.push(layer.name)
                 tile_layers[layer.name] = L.tileLayer(layer.url, layer)
             })
@@ -130,6 +108,7 @@ $(document).ready(function(){
             }
             tile_layers[localStorage.getItem("layer")].addTo(mymap);
         }
+
         refresh_layers();
 
         mymap.on("baselayerchange", function(event) {
@@ -137,39 +116,89 @@ $(document).ready(function(){
         })
     }
 
-    // ############ SQUADRATS TILES ############
+    // ############ GRID ############
     {
-        var style = {
-            name: "yard(inho)",
-            weight : 2,
-            opacity: 0.6,
-            fillOpacity : 0.4,
-            color : "blue",
-        }
-        var geojson
+        let grid_layer = new Map([["14", null]])
+        let grid_level = "14"
 
+        function display_grid_level(level, style) {
+            let shouldLayerBeDisplayed = (mymap.getZoom() > level-5)
+            if (shouldLayerBeDisplayed) {
+                let segments = generateGridSegments(mymap, level, 5000);
+                if (segments) {
+                    let geojson_grid = lines2geojson(segments, level)
+                    grid_layer.set(level, L.geoJSON(geojson_grid, style).addTo(mymap))
+                    return true
+                }
+            }
+            return false
+        }
+
+        function display_grid() {
+            var style_index = 0
+            // Remove actual grids
+            grid_layer.forEach(function(layer, level) {
+                if (layer) {
+                    layer.remove()
+                    grid_layer.set(level, null)
+                }
+            })
+            // Create grids
+            grid_layer.forEach(function(layer, level) {
+                if ((grid_level==level) || grid_level=="both") {
+                    if (display_grid_level(level, styles.grid)) {
+                        style_index += 1
+                    }
+                }
+            })
+        }
+
+        $('body').on("level_change", function(event, level) {
+            grid_level = level
+            display_grid()
+        });
+
+        mymap.on("moveend", display_grid);
+        display_grid();
+    }
+
+
+    // ############ TILES ############
+    {
+        var geojson;
+
+        styles.tiles.style = function(feature) {
+            return styles.tiles[feature.properties.kind]
+        }
 
         function squadrats_display(data) {
-            return L.geoJSON(data, style).addTo(mymap)
+            return L.geoJSON(data, styles.tiles).addTo(mymap)
+        }
+
+        function center() {
+            var center_zone = geojson
+            turf.featureEach(geojson, function (feature) {
+                if ((feature.properties.kind=="cluster") && (feature.properties.size>0)) {
+                    center_zone = feature
+                }
+            })
+            var bbox = turf.bbox(center_zone)
+            mymap.fitBounds([[bbox[1], bbox[0]], [bbox[3], bbox[2]]]);
+
         }
 
         // center on cluster when click on button
         $("#squadrats-center").on("click", function () {
-            turf.featureEach(geojson, function (feature) {
-                if ((feature.properties.kind=="cluster")
-                    && (feature.properties.size>0)) {
-                    var bbox = turf.bbox(feature)
-                    mymap.fitBounds([[bbox[1], bbox[0]], [bbox[3], bbox[2]]]);
-                }
-            })
+            center()
         })
 
         function load_squadrats_tiles(level, cache="default") {
-            fetch("gen/results/kikourou_tiles.geojson", {cache: cache})
+            fetch(geojson_file, {cache: cache})
             .then(response => response.json())
             .then(data => {
                 geojson = data
                 squadrats_display(geojson)
+                center()
             });
         }
 

@@ -17,6 +17,24 @@ def compute_max_square(tiles):
     return max_square
 
 
+def get_max_square(tiles):
+    def is_square(x, y, m):
+        for dx in range(m):
+            for dy in range(m):
+                uid = (x + dx, y + dy)
+                if uid not in tiles:
+                    return False
+        return True
+
+    max_square = 0
+    result = None
+    for (x, y) in tiles:
+        while is_square(x, y, max_square + 1):
+            max_square += 1
+            result = x, y, max_square
+    return result
+
+
 def compute_zones(tiles):
     tiles = set(tiles)
     clusters = []

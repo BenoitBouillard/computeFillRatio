@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Yardinage Kikourou [xx]</title>
+    <link rel="shortcut icon" type="image/svg+xml" href="yardinho.svg">
+    <script>
+        if (location.protocol !== 'https:') {
+            location.replace(`https:${location.href.substring(location.protocol.length)}`);
+        }
+    </script>
+    <script crossorigin="anonymous" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+            src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.12.0/js/all.js"></script>
+    <script src="user.js?version=1.5"></script>
+
+    <link rel="stylesheet" href="index.css?version=1.7">
+
+</head>
+<body>
+<h2>
+    <a href="http://www.kikourou.net/forum/viewtopic.php?f=8&t=45488">statshunters la chasse aux petits carrés de Kikourou [x]</a>
+</h2>
+<p>
+
+</p>
+
+<!-- <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+  <input type="radio" class="btn-check" name="btnradio" id="btn-all" value="all" autocomplete="off" data-sort="desc" data-text="général" checked>
+  <label class="btn btn-outline-primary" for="btn-all">Global</label>
+
+  <input type="radio" class="btn-check" name="btnradio" id="btn-day" value="day" autocomplete="off" data-sort="desc" data-text="par jour">
+  <label class="btn btn-outline-primary" for="btn-day">Jour</label>
+
+  <input type="radio" class="btn-check" name="btnradio" id="btn-week" value="week" autocomplete="off" data-sort="desc" data-text="par semaine">
+  <label class="btn btn-outline-primary" for="btn-week">Semaine</label>
+
+  <input type="radio" class="btn-check" name="btnradio" id="btn-month" value="month" autocomplete="off" data-sort="desc" data-text="par mois">
+  <label class="btn btn-outline-primary" for="btn-month">Mois</label>
+
+  <input type="radio" class="btn-check" name="btnradio" id="btn-standing" value="standing" autocomplete="off" data-sort="asc" data-text="squadrats">
+  <label class="btn btn-outline-primary" for="btn-standing">Classement</label>
+
+</div>-->
+    <span style="width:3em;" ></span>
+    <button class="btn btn-outline-primary" id="copyToClipboard"><span  style="font-size: 2em;" class="far fa-clipboard"></span></button>
+<!-- <button id="copy_ranking" class="btn btn-outline-primary">bbcode pour kikourou</button>-->
+
+
+<table id="ranking_table">
+    <tr>
+        <th>#</th>
+        <th data-sort="asc">Zone</th>
+        <th class="trophy" data-field="visited"  data-text="squadrat" data-sort="desc"><img src="squadratinhos.svg"/></th>
+        <th class="trophy" data-field="square"  data-text="ubersquadrat" data-sort="desc"><img src="ubersquadratinho.svg"/></th>
+        <th class="trophy" data-field="total"  data-text="total" data-sort="desc">total</th>
+        <th class="trophy" data-field="ratio"  data-text="ratio" data-sort="desc">%</th>
+        <!-- <th data-sort="desc" data-field="last_activity" data-text="date">dernière activité</th> -->
+    </tr>
+</table>
+
+    <p>&nbsp;</p>
+
+    <button class="btn btn-outline-primary" id="erase-storage">Effacer les données stockées</button>
+
+
+</body>
+</html>
+

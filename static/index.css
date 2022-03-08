@@ -1,0 +1,163 @@
+html {
+}
+
+body {
+    background-color: #FFFFDF;
+    font-family: verdana,arial,serif;
+    font-size: 11px;
+    line-height: 1.2;
+}
+
+a {
+    text-decoration: none;
+    color: #CC6633;
+    font-style: normal;
+}
+
+h2 {
+    font-weight: normal;
+    color: #CC6633;
+    font-size: 2em;
+    margin: 0.8em 0 0.2em 0;
+}
+
+table {
+    background-color: #FFCC33;
+    border: 2px solid #CC6633;
+    border-collapse: separate;
+}
+
+th {
+    padding: 5px;
+    margin: 0px;
+    border-top: solid 1px rgb(216,206,159);
+}
+
+th[data-sort] {
+    cursor: pointer;
+    text-decoration: none;
+    color: #CC6633;
+    font-style: normal;
+}
+
+td {
+    background-color: #FFFFDF;
+    padding: 0.2em 1em 0.2em 1em;
+    height: 1.5em;
+}
+
+td img {
+    height: 1.6em;
+    margin: -0.2em 0 -0.2em 0;
+}
+
+span.spacer {
+    margin: -0.2em 0.5em -0.2em 0.5em;
+}
+
+tr.selected>td {
+    background-color: #f8d65e;
+}
+
+tr>td.max {
+    background-color: #c0ffc0;
+}
+
+td.number {
+    text-align: right;
+}
+
+
+
+.btn {
+display: inline-block;
+font-weight: 400;
+line-height: 1.5;
+color: #212529;
+text-align: center;
+text-decoration: none;
+vertical-align: middle;
+cursor: pointer;
+-webkit-user-select: none;
+-moz-user-select: none;
+user-select: none;
+background-color: transparent;
+border: 1px solid;
+padding: .375rem .75rem;
+/*font-size: 1rem;*/
+border-radius: .25rem;
+transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+.btn-group, .btn-group-vertical {
+position: relative;
+display: inline-flex;
+vertical-align: middle;
+}
+
+.btn-check {
+position: absolute;
+clip: rect(0,0,0,0);
+pointer-events: none;
+}
+
+button, input, optgroup, select, textarea {
+margin: 0;
+font-family: inherit;
+font-size: inherit;
+line-height: inherit;
+}
+
+.btn-group>.btn-group:not(:last-child)>.btn, .btn-group>.btn:not(:last-child):not(.dropdown-toggle) {
+border-top-right-radius: 0;
+border-bottom-right-radius: 0;
+}
+
+.btn-group>.btn-group:not(:first-child)>.btn, .btn-group>.btn:nth-child(n+3), .btn-group>:not(.btn-check)+.btn {
+border-top-left-radius: 0;
+border-bottom-left-radius: 0;
+}
+
+.btn-group-vertical>.btn-check:checked+.btn, .btn-group-vertical>.btn-check:focus+.btn, .btn-group-vertical>.btn.active, .btn-group-vertical>.btn:active, .btn-group-vertical>.btn:focus, .btn-group-vertical>.btn:hover, .btn-group>.btn-check:checked+.btn, .btn-group>.btn-check:focus+.btn, .btn-group>.btn.active, .btn-group>.btn:active, .btn-group>.btn:focus, .btn-group>.btn:hover {
+z-index: 1;
+}
+
+.btn-group>.btn-group:not(:first-child), .btn-group>.btn:not(:first-child) {
+margin-left: -1px;
+}
+
+.btn-outline-primary {
+color: #CC6633;
+border-color: #CC6633;
+}
+
+.btn-check:active+.btn-outline-primary, .btn-check:checked+.btn-outline-primary, .btn-outline-primary.active, .btn-outline-primary.dropdown-toggle.show, .btn-outline-primary:active {
+color: #fff;
+background-color: #CC6633;
+border-color: #CC6633;
+}
+
+.btn-group-vertical>.btn, .btn-group>.btn {
+position: relative;
+flex: 1 1 auto;
+}
+
+
+
+label {
+display: inline-block;
+}
+
+*, ::after, ::before {
+box-sizing: border-box;
+}
+
+
+::before
+bootstrap.css:64*, ::after, ::before {
+box-sizing: border-box;
+}
+::after
+bootstrap.css:64*, ::after, ::before {
+box-sizing: border-box;
+}

@@ -9,7 +9,7 @@ from common.tile import tile_from_coord, Tile
 from common.fileutils import FileCheck
 
 
-def kml_zone_to_tiles(kml_file):
+def load_kml_geom(kml_file):
     k = kml.KML()
     with open(kml_file, 'rb') as kml_handle:
         doc = kml_handle.read()
@@ -18,13 +18,18 @@ def kml_zone_to_tiles(kml_file):
     features = list(k.features())
     folder = list(features[0].features())[0]
     geometry = folder.geometry
-    tiles_inner = set()
-    tiles_outer = set()
 
     if hasattr(geometry, 'geoms'):
         geoms = geometry.geoms
     else:
         geoms = [geometry]
+    return geoms
+
+
+def kml_zone_to_tiles(kml_file):
+    geoms = load_kml_geom(kml_file)
+    tiles_inner = set()
+    tiles_outer = set()
 
     for geo in geoms:
         polygon = Polygon(geo)
