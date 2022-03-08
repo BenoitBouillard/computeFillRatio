@@ -17,7 +17,8 @@ $(document).ready(function(){
             }*/
         }
 
-        var max_field = {cluster: null, visited: null, square:null/*, last_activity:null*/ }
+        var max_field = {cluster: null, visited: null, square:null, count:null, eddington:null, eddington10:null, squares:null, eddingtonSquare:null /*, last_activity:null*/ }
+
         $.each(ranking_data, function(name, user) {
             $.each(max_field, function(field, value) {
                 if ($('th[data-field="'+field+'"]').data("sort")=="desc") {
