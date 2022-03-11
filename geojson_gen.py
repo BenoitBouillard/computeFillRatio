@@ -118,6 +118,11 @@ def generate_user(user):
 
         geojson_filename = os.path.join(GEN_USERS, user['name'], user['name'] + '_' + zone + ".geojson")
 
+        path = config['zones'][zone].replace("%GEN_ZONES%", GEN_ZONES).replace('.kml', '.geojson')
+        with open(path, 'r') as fP:
+            limit = geojson.load(fP)
+            sc.append(geojson.Feature(geometry=limit, properties= {"kind": "zone_limit"}))
+
         sc.append(geojson.Feature(geometry=non_explored_geojson,
                                   properties={"kind": "unvisited",
                                               "size": len(non_explored_tiles_zone)

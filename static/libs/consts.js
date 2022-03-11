@@ -112,6 +112,12 @@ export const styles = {
             fillOpacity : 0.25,
             color : "blue"
         },
+        zone_limit: {
+            weight : 2,
+            opacity: 0.7,
+            fillOpacity : 0.0,
+            color : "black"
+        },
         unvisited: {
             name: "non visité",
             weight : 1,
