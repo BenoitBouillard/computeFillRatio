@@ -1,4 +1,4 @@
-import {styles, consts} from "./libs/consts.js?version=1.4"
+import {styles, consts} from "./libs/consts.js?version=1.5"
 
 // ############ MAP SIZE ############
 {

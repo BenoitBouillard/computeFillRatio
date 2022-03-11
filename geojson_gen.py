@@ -36,6 +36,14 @@ fr_zones = [zone for zone in outer_zones.keys() if re.match("[0-9].*", zone)]
 
 result_dict = {}
 
+bbi_config = {
+    "count": lambda r: len(r),
+    "eddington": lambda r: eddigton(r, lambda x: x['visited']),
+    "eddington10": lambda r: eddigton(r, lambda x: x['visited'] / 10),
+    "squares": lambda r: sum([z['square'] for z in r.values()]),
+    "eddingtonSquare": lambda r: eddigton(r, lambda x: x['square'])
+}
+bbi_results = []
 
 def eddigton(data, value):
     eddington = 1
@@ -167,15 +175,7 @@ def generate_user(user):
 
     # BBI
     fr_results = {k: v for k, v in user_result['zones'].items() if re.match("[0-9].*", k)}
-    bbi = {
-        "count": len(fr_results),
-        "eddington": eddigton(fr_results, lambda x: x['visited']),
-        "eddington10": eddigton(fr_results, lambda x: x['visited']/10),
-        "squares": sum([z['square'] for z in fr_results.values()]),
-        "eddingtonSquare": eddigton(fr_results, lambda x: x['square'])
-    }
-    for k, v in bbi.items():
-        user_result[k] = v
+    user_result['bbi'] = {k: v(fr_results) for k, v in bbi_config.items()}
 
     with FileCheck(user_json_filename) as h:
         h.write(geojson.dumps(user_result, indent=2))
@@ -184,6 +184,23 @@ def generate_user(user):
 
 for user in users:
     result_dict[user['name']] = generate_user(user)
+    ur = {'user': user['name']}
+    ur.update(result_dict[user['name']]['bbi'])
+    bbi_results.append(ur)
+
+fields_results = {}
+for f in bbi_config.keys():
+    fields_results[f] = sorted([u[f] for u in bbi_results], reverse=True)
+    for user in bbi_results:
+        rank = fields_results[f].index(user[f])
+        user["rank_"+f] = rank + 1
+        user["rank"] += rank
+
 
 with FileCheck(os.path.join(GEN_PUBLIC_PATH, "users.json")) as hF:
     hF.write(json.dumps(result_dict, indent=2))
+
+
+
+with FileCheck(os.path.join(GEN_PUBLIC_PATH, "bbi.json")) as hF:
+    hF.write(json.dumps(bbi_results, indent=2))
