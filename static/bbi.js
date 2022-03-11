@@ -17,7 +17,8 @@ $(document).ready(function(){
             }*/
         }
 
-        var max_field = {cluster: null, visited: null, square:null /*, last_activity:null*/ }
+        var max_field = {count: null,  eddington:null, eddington10:null, squares:null, eddingtonSquare:null, rank: null /*, last_activity:null*/ }
+
 
         $.each(ranking_data, function(name, user) {
             $.each(max_field, function(field, value) {
@@ -34,7 +35,7 @@ $(document).ready(function(){
         })
 
         $.each(ranking_data, function(name, user) {
-            if ($('tr[id="'+name+'"]').length) {
+            if ($('tr[id="'+user['name']+'"]').length) {
                 tr = $('tr[id="'+user['name']+'"]')
                 tr.children().not('td:first').remove()
             } else {
@@ -44,7 +45,7 @@ $(document).ready(function(){
                 }
             }
             var td = $('<td>' + user['name'] + '</td>').appendTo(tr)
-            td.wrapInner('<a target="_blank" href="map.html?user='+user['name']+'"></a>')
+            td.wrapInner('<a target="_blank" href="user.html?user='+user['name']+'"></a>')
             $.each(max_field, function(field, max_value) {
                 td = $('<td class="number">' + get_val(user, field) + '</td>').appendTo(tr)
                 if (get_val(user, field) == max_value) td.addClass('max')
@@ -52,26 +53,12 @@ $(document).ready(function(){
                     td.wrapInner('<a target="_blank" href="'+user['last_activity_url']+'"></a>')
                 }
             })
-            var td = $('<td></td>').appendTo(tr)
-                td.append('<a href="user.html?user='+ user['name'] +'">detail</a>')
-            /*if (user['kml_url']) {
-                td.append('<a href="'+ user['kml_url'] +'" target="_blank"><img src="media/kml.png"></a>')
-            }
-            if (user['squadrats_url'] != "") {
-                td.append('<span class="spacer"></span><a href="'+ user['squadrats_url'] +'" target="_blank"><img src="https://squadrats.com/squadrats-iconfav.png"></a>')
-            }*/
         })
     }
 
-    $('input[type=radio][name=btnradio]').change(function() {
-      console.log($('input[name="btnradio"]:checked').val())
-      $("th.trophy").data("sort", $('input[name="btnradio"]:checked').data('sort'))
-      load_table();
-      sort_table($('th[data-sort][data-sorted="true').index())
-    });
 
 
-    $.ajax("gen/users.json", {
+    $.ajax("gen/bbi.json", {
       dataType: "json",
       cache: false,
       success: function(data) {
@@ -118,15 +105,19 @@ $(document).ready(function(){
 
     $('#copyToClipboard').click(function() {
         console.log("copyToClipboard")
-        result = "Classement "+ $('input[name="btnradio"]:checked').data("text")
+        result = "Classement BBI "
         result += " trié par " + $('th[data-sort][data-sorted="true').data("text") + ":\n"
         $('tr.kikou').each(function() {
             result += $("td:eq(0)", this).text() + ") " + $("td:eq(1)", this).text()
             result += " : " + $("td:eq(2)", this).text()
             result += " / " + $("td:eq(3)", this).text()
             result += " / " + $("td:eq(4)", this).text()
+            result += " / " + $("td:eq(5)", this).text()
+            result += " / " + $("td:eq(6)", this).text()
+            result += " = " + $("td:eq(7)", this).text()
             result +="\n"
         })
+
         navigator.clipboard.writeText(result).then(function() {
           window.alert("Le classement est copié dans le presse papier")
         }, function(err) {
@@ -135,31 +126,6 @@ $(document).ready(function(){
         console.log(result)
     })
 
-
-    $('#copy_ranking').click(async function() {
-        async function get_blob_ranking() {
-            const rep = await fetch("gen/ranking.bbcode")
-            const bbcode = await rep.text()
-            return new Blob([bbcode], { type: 'text/plain' })
-        }
-
-        async function copy_ranking() {
-            if ( navigator.clipboard.write && !navigator.userAgent.includes("Chrome")) {
-                return navigator.clipboard.write([new ClipboardItem({ "text/plain": get_blob_ranking() })])
-            } else {
-                const blob = await get_blob_ranking()
-                const txt = await blob.text()
-                return navigator.clipboard.writeText(txt)
-            }
-        }
-
-        copy_ranking().then(function() {
-            window.alert("Le classement est copié dans le presse papier")
-        }, function(err) {
-            window.alert("Un problème est arrivé: "+ err.message)
-            window.open("gen/ranking.bbcode.html",'_blank');
-        });
-    })
 
     var touchtime = 0;
     var currentTarget = null;

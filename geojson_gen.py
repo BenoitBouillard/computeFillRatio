@@ -184,7 +184,7 @@ def generate_user(user):
 
 for user in users:
     result_dict[user['name']] = generate_user(user)
-    ur = {'user': user['name']}
+    ur = {'name': user['name'], 'rank': 1}
     ur.update(result_dict[user['name']]['bbi'])
     bbi_results.append(ur)
 

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>[x] BBI</title>
+    <link rel="shortcut icon" type="image/svg+xml" href="yardinho.svg">
+    <script>
+        if (location.protocol !== 'https:') {
+            location.replace(`https:${location.href.substring(location.protocol.length)}`);
+        }
+    </script>
+    <script crossorigin="anonymous" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+            src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.12.0/js/all.js"></script>
+    <script src="bbi.js?version=1.5"></script>
+
+    <link rel="stylesheet" href="index.css?version=1.7">
+
+</head>
+<body>
+    <a href="index.html">< Retour au classement</a>
+
+<h2>
+    <a href="http://www.kikourou.net/forum/viewtopic.php?f=8&t=45488">Challenge BBI par départements</a>
+</h2>
+
+
+    <button class="btn btn-outline-primary" id="copyToClipboard"><span  style="font-size: 2em;" class="far fa-clipboard"></span></button>
+
+
+<table id="ranking_table">
+    <tr>
+        <th>#</th>
+        <th data-sort="asc">Nom</th>
+        <th class="trophy" data-field="count"  data-text="nb departement" data-sort="desc" >NB</th>
+        <th class="trophy" data-field="eddington"  data-text="BBI" data-sort="desc" >BBI</th>
+        <th class="trophy" data-field="eddington10"  data-text="BBI*10" data-sort="desc" >BBI*10</th>
+        <th class="trophy" data-field="squares"  data-text="Somme des carrés" data-sort="desc" >SUM.SQ</th>
+        <th class="trophy" data-field="eddingtonSquare"  data-text="BBI des carrés" data-sort="desc" >BBI.SQ</th>
+        <th class="trophy" data-field="rank"  data-text="points" data-sort="asc" data-sorted="true">Points</th>
+    </tr>
+</table>
+
+<p>
+Légende:
+    <ul>
+        <li>NB: nombre de département visité</li>
+        <li>BBI : BouBouIndex(c) entre le nombre de carré et le nombre de département (par ex. 14 signifie avoir fait 14 départements avec au moins 14 carrés)</li>
+        <li>BBI*10: pareil, mais avec 10 fois plus de carrés que de département (dans l'exemple précédent, il faut 140 carrés par département dans 14 départements)</li>
+        <li>SUM.SQ: somme des plus grand carré par département. Par exemple, si dans un département vous avez un carré de 10x10 et dans un autre 5x5, cela fait 15</li>
+        <li>BBI.SQ: BouBouIndex(c) entre le max square et les départements. Rem avec un 7 signifie qu'il a 7 départements avec un 7x7</li>
+        <li>Points: Somme "normalisée" des classements de chaque catégorie (une valeur de 1 signifierai être premier dans chaque catégorie)</li>
+    </ul>
+
+</p>
+
+</body>
+</html>
+
