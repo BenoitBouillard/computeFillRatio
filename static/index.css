@@ -161,3 +161,10 @@ box-sizing: border-box;
 bootstrap.css:64*, ::after, ::before {
 box-sizing: border-box;
 }
+
+
+.nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
+color: #F8D648;
+background-color: #0a58ca;
+border-color: #dee2e6 #dee2e6 #0a58ca;
+}
