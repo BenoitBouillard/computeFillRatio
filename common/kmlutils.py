@@ -9,6 +9,17 @@ from common.tile import tile_from_coord, Tile
 from common.fileutils import FileCheck
 
 
+def load_kml_geometry(kml_file):
+    k = kml.KML()
+    with open(kml_file, 'rb') as kml_handle:
+        doc = kml_handle.read()
+        k.from_string(doc)
+
+    features = list(k.features())
+    folder = list(features[0].features())[0]
+    return folder.geometry
+
+
 def load_kml_geom(kml_file):
     k = kml.KML()
     with open(kml_file, 'rb') as kml_handle:

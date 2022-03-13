@@ -1,6 +1,5 @@
 from common.config import *
-from common.config import GEN_PATH
-from common.kmlutils import load_kml_geom
+from common.kmlutils import load_kml_geometry
 from common.geojson_utils import shapely_to_geojson
 import geojson
 from shapely.geometry import shape
@@ -14,7 +13,7 @@ if __name__ == '__main__':
     for zone in config['zones']:
         print(zone)
         path = config['zones'][zone].replace("%GEN_ZONES%", GEN_ZONES)
-        geom = shape(load_kml_geom(path)[0])
+        geom = shape(load_kml_geometry(path))
 
         geojson_path = path[:-3] + "geojson"
 
