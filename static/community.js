@@ -11,7 +11,7 @@ $(document).ready(function(){
         row_id: function(data) { return data.name},
         highlight: "country_statshunter",
         fields: {
-            ratio:  user => parseFloat((100.0*user["visited"]/user["size"]).toFixed(2))
+            ratio:  zone => parseFloat((100.0*zone.all.visited/zone.all.size).toFixed(2))
         },
         post_action_td: {
         },
@@ -26,7 +26,7 @@ $(document).ready(function(){
             return data['France'].zones
         },
         fields: {
-            ratio:  user => parseFloat((100.0*user["visited"]/user["size"]).toFixed(2))
+            ratio:  zone => parseFloat((100.0*zone.visited/zone.size).toFixed(2))
         },
         row_id: function(data) { return data.name},
         highlight: "zone_statshunter",
@@ -43,7 +43,7 @@ $(document).ready(function(){
             return data['Belgique'].zones
         },
         fields: {
-            ratio:  user => parseFloat((100.0*user["visited"]/user["size"]).toFixed(2))
+            ratio:  zone => parseFloat((100.0*zone.visited/zone.size).toFixed(2))
         },
         row_id: function(data) { return data.name},
         highlight: "zone_statshunter",
@@ -60,7 +60,7 @@ $(document).ready(function(){
             return data['Suisse'].zones
         },
         fields: {
-            ratio:  user => parseFloat((100.0*user["visited"]/user["size"]).toFixed(2))
+            ratio:  zone => parseFloat((100.0*zone.visited/zone.size).toFixed(2))
         },
         row_id: function(data) { return data.name},
         highlight: "zone_statshunter",
