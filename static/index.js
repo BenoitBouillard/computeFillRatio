@@ -10,11 +10,11 @@ $(document).ready(function(){
         highlight: "user_statshunter",
         post_action_td: {
             'name': function(td, data) {
-                $(td).wrapInner('<a target="_blank" href="map.html?user='+data['name']+'"></a>')
+                $(td).wrapInner('<a href="user.html?user='+data['name']+'"></a>')
             }
         },
         post_action_tr: function(tr, data) {
-            $('<td><a href="user.html?user='+ data['name'] +'">detail</a></td>').appendTo(tr)
+            $('<td><a target="_blank" href="map.html?user='+ data['name'] +'">carte</a></td>').appendTo(tr)
         }
 
     })

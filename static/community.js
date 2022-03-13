@@ -1,7 +1,6 @@
 
 import {TableData} from "./libs/table_data.js?version=1.1"
 
-
 $(document).ready(function(){
 
 
