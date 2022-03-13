@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 import json
 
-from common.config import load_users, GEN_PUBLIC_PATH, load_config, GEN_ZONES, GEN_USERS
+from common.config import load_users, GEN_PUBLIC_PATH, load_config, GEN_ZONES, GEN_USERS, GEN_RESULTS
 from common.statshunters import tiles_from_activities
 from common.zones import load_zones_outer
 from fill_ratio import compute_fill_ratio
@@ -71,7 +71,7 @@ def generate_user(user):
         if previous_result.get("visited", 0) == len(explored_tiles):
             # no change
             print("No change for "+user['name'])
-            return previous_result
+            return previous_result, explored_tiles
     print("Treat "+user['name'])
     max_square = get_max_square(explored_tiles)
     cluster = compute_max_cluster(explored_tiles)
@@ -113,7 +113,6 @@ def generate_user(user):
         sc = []
 
         zone_tiles = outer_zones[zone]
-        zone_limit_file = config['zones'][zone].replace("%GEN_ZONES%", GEN_ZONES).replace('.kml', '.geojson')
         explored_tiles_zone = zone_tiles & explored_tiles
         if not explored_tiles_zone:
             continue
@@ -169,6 +168,7 @@ def generate_user(user):
             'name': zone,
             'visited': len(explored_tiles_zone),
             'total': len(zone_tiles),
+            'ratio': round(100.0 * len(explored_tiles_zone) / len(zone_tiles), 2),
             'square': zone_max_square[2],
             'geojson': geojson_filename
         }
@@ -179,14 +179,23 @@ def generate_user(user):
 
     with FileCheck(user_json_filename) as h:
         h.write(geojson.dumps(user_result, indent=2))
-    return user_result
+    return user_result, explored_tiles
 
+geoms_users = []
+community_tiles = set()
 
 for user in users:
-    result_dict[user['name']] = generate_user(user)
+    result_dict[user['name']], user_tiles = generate_user(user)
     ur = {'name': user['name'], 'rank': 1}
     ur.update(result_dict[user['name']]['bbi'])
     bbi_results.append(ur)
+    community_tiles |= user_tiles
+    geom_z = unary_union([Tile(*t).polygon for t in user_tiles])
+    geoms_users.append(geom_z)
+
+geom_z = unary_union(geoms_users)
+with open(os.path.join(GEN_RESULTS, "kikourou_tiles.geojson"), "w") as h:
+    h.write(geojson.dumps(shapely_to_geojson(geom_z)))
 
 fields_results = {}
 for f in bbi_config.keys():
@@ -201,6 +210,36 @@ with FileCheck(os.path.join(GEN_PUBLIC_PATH, "users.json")) as hF:
     hF.write(json.dumps(result_dict, indent=2))
 
 
-
 with FileCheck(os.path.join(GEN_PUBLIC_PATH, "bbi.json")) as hF:
     hF.write(json.dumps(bbi_results, indent=2))
+
+# COMMUNITY ZONES
+community_zones = {}
+for country in config['countries']:
+    community_zones[country] = {'name': country, 'zones':{}}
+    outer_zones = load_zones_outer(re_filter=config['countries'][country])
+
+    all_tiles_country = set()
+    for zt in outer_zones.values():
+        all_tiles_country |= zt
+
+    community_tiles_country = community_tiles & all_tiles_country
+
+    zone_results = []
+    for zone in outer_zones:
+        community_tiles_zone = community_tiles_country & outer_zones[zone]
+        zone_results.append([zone, len(community_tiles_zone), len(outer_zones[zone]),
+                             len(community_tiles_zone) / len(outer_zones[zone]) * 100])
+        community_zones[country]['zones'][zone] = {
+            'name': zone,
+            'visited': len(community_tiles_zone),
+            'size': len(outer_zones[zone])
+        }
+
+    community_zones[country]['all'] = {
+        'visited': len(community_tiles_country),
+        'size': len(all_tiles_country)
+    }
+
+with FileCheck(os.path.join(GEN_PUBLIC_PATH, "community_zones.json")) as hF:
+    hF.write(json.dumps(community_zones, indent=2))
