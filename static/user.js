@@ -28,7 +28,7 @@ $(document).ready(function(){
         },
         post_action_td: {
             'zone': function(td, data) {
-                $(td).wrapInner('<a target="_blank" href="map.html?user='+user_name+'"&zone='+data.name+'></a>')
+                $(td).wrapInner('<a target="_blank" href="map.html?user='+user_name+'&zone='+data.name+'"></a>')
             }
         },
         post_action_tr: function(tr, data) {
