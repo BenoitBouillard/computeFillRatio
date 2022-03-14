@@ -4,7 +4,7 @@ import {TableData} from "./libs/table_data.js?version=1.1"
 $(document).ready(function(){
 
 
-    countryRanking = new TableData("#countryRanking",
+    var countryRanking = new TableData("#countryRanking",
     {
         source: "gen/community_zones.json",
         row_id: function(data) { return data.name},
@@ -18,7 +18,7 @@ $(document).ready(function(){
         }
     })
 
-    franceRanking = new TableData("#franceRanking",
+    var franceRanking = new TableData("#franceRanking",
     {
         source: "gen/community_zones.json",
         post_source : function(data) {
@@ -35,7 +35,7 @@ $(document).ready(function(){
         }
     })
 
-    belgiqueRanking = new TableData("#belgiqueRanking",
+    var belgiqueRanking = new TableData("#belgiqueRanking",
     {
         source: "gen/community_zones.json",
         post_source : function(data) {
@@ -52,7 +52,7 @@ $(document).ready(function(){
         }
     })
 
-    suisseRanking = new TableData("#suisseRanking",
+    var suisseRanking = new TableData("#suisseRanking",
     {
         source: "gen/community_zones.json",
         post_source : function(data) {
@@ -69,7 +69,7 @@ $(document).ready(function(){
         }
     })
 
-    allemagneRanking = new TableData("#allemagneRanking",
+    var allemagneRanking = new TableData("#allemagneRanking",
     {
         source: "gen/community_zones.json",
         post_source : function(data) {

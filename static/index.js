@@ -3,7 +3,7 @@ import {TableData} from "./libs/table_data.js?version=1.1"
 
 
 $(document).ready(function(){
-    userRanking = new TableData("#userRanking",
+    var userRanking = new TableData("#userRanking",
     {
         source: "gen/users.json",
         row_id: function(data) { return data.name},
