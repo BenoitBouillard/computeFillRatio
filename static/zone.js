@@ -24,6 +24,9 @@ $(document).ready(function(){
         },
         row_id: function(data) { return data.user},
         highlight: "user_statshunter",
+        fields: {
+            ratio:  zone => parseFloat((100.0*zone["visited"]/zone["total"]).toFixed(2))
+        },
         post_action_td: {
             user: function(td, data) {
                 $(td).wrapInner('<a href="user.html?user='+data.user+'"></a>')
