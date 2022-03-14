@@ -22,12 +22,12 @@ $(document).ready(function(){
         },
 
         row_id: function(data) { return data.name},
-        highlight: "zone_statshunter",
+        highlight: "user_statshunter",
         fields: {
             ratio:  user => parseFloat((100.0*user["visited"]/user["total"]).toFixed(2))
         },
         post_action_td: {
-            'zone': function(td, data) {
+            'name': function(td, data) {
                 $(td).wrapInner('<a target="_blank" href="map.html?user='+user_name+'&zone='+data.name+'"></a>')
             }
         },

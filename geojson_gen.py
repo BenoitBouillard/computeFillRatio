@@ -205,35 +205,49 @@ for f in bbi_config.keys():
         user["rank_"+f] = rank + 1
         user["rank"] += rank
 
-
 with FileCheck(os.path.join(GEN_PUBLIC_PATH, "users.json")) as hF:
     hF.write(json.dumps(result_dict, indent=2))
 
-
 with FileCheck(os.path.join(GEN_PUBLIC_PATH, "bbi.json")) as hF:
     hF.write(json.dumps(bbi_results, indent=2))
+
+# USERS BY ZONES
+zones_users_results = { k:[] for k in outer_zones.keys()}
+for user in result_dict.values():
+    for zone in user['zones'].values():
+        if zone['name'] not in zones_users_results: continue
+        zu = zone.copy()
+        zu['user'] = user['name']
+        zu['zone'] = zone['name']
+        zu.pop('name')
+        zones_users_results[zone['name']].append(zu)
+
+for zone in zones_users_results.values():
+    zone.sort(key=lambda z:z['visited'], reverse=True)
+
 
 # COMMUNITY ZONES
 community_zones = {}
 for country in config['countries']:
     community_zones[country] = {'name': country, 'zones':{}}
-    outer_zones = load_zones_outer(re_filter=config['countries'][country])
+    c_outer_zones = load_zones_outer(re_filter=config['countries'][country])
 
     all_tiles_country = set()
-    for zt in outer_zones.values():
+    for zt in c_outer_zones.values():
         all_tiles_country |= zt
 
     community_tiles_country = community_tiles & all_tiles_country
 
     zone_results = []
-    for zone in outer_zones:
-        community_tiles_zone = community_tiles_country & outer_zones[zone]
-        zone_results.append([zone, len(community_tiles_zone), len(outer_zones[zone]),
-                             len(community_tiles_zone) / len(outer_zones[zone]) * 100])
+    for zone in c_outer_zones:
+        community_tiles_zone = community_tiles_country & c_outer_zones[zone]
+        zone_results.append([zone, len(community_tiles_zone), len(c_outer_zones[zone]),
+                             len(community_tiles_zone) / len(c_outer_zones[zone]) * 100])
         community_zones[country]['zones'][zone] = {
             'name': zone,
             'visited': len(community_tiles_zone),
-            'size': len(outer_zones[zone])
+            'size': len(c_outer_zones[zone]),
+            'users': zones_users_results.get(zone, [])
         }
 
     community_zones[country]['all'] = {
@@ -243,3 +257,7 @@ for country in config['countries']:
 
 with FileCheck(os.path.join(GEN_PUBLIC_PATH, "community_zones.json")) as hF:
     hF.write(json.dumps(community_zones, indent=2))
+
+
+with FileCheck(os.path.join(GEN_PUBLIC_PATH, "zones_users.json")) as hF:
+    hF.write(json.dumps(zones_users_results, indent=2))

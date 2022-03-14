@@ -45,6 +45,7 @@ export class TableData {
 
         $.each(this.data, function(name, user) {
             $.each(max_field, function(field, value) {
+                if (tableObj.table.find('th[data-field="'+field+'"]').data("max") == "no") return
                 if ($('th[data-field="'+field+'"]', tableObj.table).data("sort")=="desc") {
                     if ((value == null) || (get_val(user, field) > value)) {
                         max_field[field] = get_val(user, field)
@@ -69,12 +70,27 @@ export class TableData {
                     tr.addClass("selected")
                 }
             }
-            var td = $('<td>' + user['name'] + '</td>').appendTo(tr)
+            //var td = $('<td>' + user['name'] + '</td>').appendTo(tr)
+            $.each(tableObj.table.find('th').slice(1), function () {
+                var field = $(this).data('field')
+                var value = get_val(user, field)
+                var td = $('<td>' + value + '</td>').appendTo(tr)
+                if (!isNaN(value)) {
+                    td.addClass("number")
+                }
+                if ((field in max_field) && (get_val(user, field) == max_field[field])) {
+                    td.addClass('max')
+                }
+                if ('post_action_td' in tableObj.conf && field in tableObj.conf.post_action_td) {
+                    tableObj.conf.post_action_td[field](td, user)
+                }
 
-            $.each(max_field, function(field, max_value) {
-                td = $('<td class="number">' + get_val(user, field) + '</td>').appendTo(tr)
-                if (get_val(user, field) == max_value) td.addClass('max')
             })
+
+            /*$.each(max_field, function(field, max_value) {
+                var td = $('<td class="number">' + get_val(user, field) + '</td>').appendTo(tr)
+                if (get_val(user, field) == max_value) td.addClass('max')
+            })*/
             tableObj.table.find('th[data-post]').each(function() {
                 tableObj.conf.post_action_td[$(this).data("post")](tr.find('td').eq($(this).index()), user)
             })
