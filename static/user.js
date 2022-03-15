@@ -11,7 +11,7 @@ $(document).ready(function(){
         user_name = urlParams.get('user')
         $('span[data-replace="name"]').text(user_name)
         document.title = "[x] "+ user_name
-        $("#user_map_link").attr("href", "map.html?user="+user_name)
+        $("#user_map_link").attr("href", `map.html?user=${user_name}`)
     }
 
     var table = new TableData("#ranking_table",
@@ -21,14 +21,14 @@ $(document).ready(function(){
             return data[user_name].zones
         },
 
-        row_id: function(data) { return data.name},
+        row_id: function(data) { return data.zone.code},
         highlight: "user_statshunter",
         fields: {
             ratio:  user => parseFloat((100.0*user["visited"]/user["total"]).toFixed(2))
         },
         post_action_td: {
-            'name': function(td, data) {
-                $(td).wrapInner('<a target="_blank" href="map.html?user='+user_name+'&zone='+data.name+'"></a>')
+            'zone.name': function(td, data) {
+                $(td).wrapInner(`<a target="_blank" href="map.html?user=${user_name}&zone=${data.zone.code}"></a>`)
             }
         },
         post_action_tr: function(tr, data) {

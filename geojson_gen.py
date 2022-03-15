@@ -32,7 +32,19 @@ if user:
 config = load_config()
 outer_zones = load_zones_outer()
 
-fr_zones = [zone for zone in outer_zones.keys() if re.match("[0-9].*", zone)]
+zones_name = {}
+for zone, zone_file in config['zones'].items():
+    country = None
+    for c, r in config['countries'].items():
+        if re.match(r, zone):
+            country = c
+            break
+
+    zones_name[zone] = {
+        'code': zone,
+        'name': zone_file.split('/')[-1].split('.')[0],
+        'country': country
+    }
 
 result_dict = {}
 
@@ -102,7 +114,7 @@ def generate_user(user):
     with FileCheck(geojson_filename) as h:
         h.write(geojson.dumps(geojson_collection))
     user_result = {
-        'name': user['name'],
+        'user': user['name'],
         'visited': len(explored_tiles),
         'square': max_square[2],
         'cluster': len(cluster),
@@ -165,7 +177,8 @@ def generate_user(user):
             h.write(geojson.dumps(geojson_collection))
 
         user_result['zones'][zone] = {
-            'name': zone,
+            'zone': zones_name[zone],
+            'user': user['name'],
             'visited': len(explored_tiles_zone),
             'total': len(zone_tiles),
             'ratio': round(100.0 * len(explored_tiles_zone) / len(zone_tiles), 2),
@@ -215,12 +228,7 @@ with FileCheck(os.path.join(GEN_PUBLIC_PATH, "bbi.json")) as hF:
 zones_users_results = { k:[] for k in outer_zones.keys()}
 for user in result_dict.values():
     for zone in user['zones'].values():
-        if zone['name'] not in zones_users_results: continue
-        zu = zone.copy()
-        zu['user'] = user['name']
-        zu['zone'] = zone['name']
-        zu.pop('name')
-        zones_users_results[zone['name']].append(zu)
+        zones_users_results[zone['zone']['code']].append(zone)
 
 for zone in zones_users_results.values():
     zone.sort(key=lambda z:z['visited'], reverse=True)
@@ -244,7 +252,7 @@ for country in config['countries']:
         zone_results.append([zone, len(community_tiles_zone), len(c_outer_zones[zone]),
                              len(community_tiles_zone) / len(c_outer_zones[zone]) * 100])
         community_zones[country]['zones'][zone] = {
-            'name': zone,
+            'zone': zones_name[zone],
             'visited': len(community_tiles_zone),
             'size': len(c_outer_zones[zone]),
             'users': zones_users_results.get(zone, [])
