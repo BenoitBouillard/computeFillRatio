@@ -22,7 +22,7 @@ $(document).ready(function(){
         },
 
         row_id: function(data) { return data.zone.code},
-        highlight: "user_statshunter",
+        highlight: "zone_statshunter",
         fields: {
             ratio:  user => parseFloat((100.0*user["visited"]/user["total"]).toFixed(2))
         },

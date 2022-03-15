@@ -105,7 +105,7 @@ export class TableData {
           cache: false,
           success: function(data) {
             if ('post_source' in tableObj.conf) {
-                tableObj.data = tableObj.conf.post_source(data)
+                tableObj.data = tableObj.conf.post_source(data, tableObj.conf)
             } else {
                 tableObj.data = data
             }

@@ -19,6 +19,10 @@ $(document).ready(function(){
     })
 
     var config_base = {
+        source: "gen/community_zones.json",
+        post_source : function(data, conf) {
+            return data[conf.country].zones
+        },
         row_id: function(data) { return data.zone.code},
         highlight: "zone_statshunter",
         fields: {
@@ -56,31 +60,19 @@ $(document).ready(function(){
 
 
     var franceRanking = new TableData("#franceRanking", Object.assign({}, config_base, {
-        source: "gen/community_zones.json",
-        post_source : function(data) {
-            return data['France'].zones
-        }
+        country: "France"
     }))
 
     var belgiqueRanking = new TableData("#belgiqueRanking", Object.assign({}, config_base, {
-        source: "gen/community_zones.json",
-        post_source : function(data) {
-            return data['Belgique'].zones
-        }
+        country: "Belgique"
     }))
 
     var suisseRanking = new TableData("#suisseRanking", Object.assign({}, config_base, {
-        source: "gen/community_zones.json",
-        post_source : function(data) {
-            return data['Suisse'].zones
-        }
+        country: "Suisse"
     }))
 
     var allemagneRanking = new TableData("#allemagneRanking", Object.assign({}, config_base, {
-        source: "gen/community_zones.json",
-        post_source : function(data) {
-            return data['Allemagne'].zones
-        }
+        country: "Allemagne"
     }))
 
 
