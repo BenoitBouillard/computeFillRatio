@@ -24,56 +24,56 @@ args = parser.parse_args()
 user = vars(args)['user']
 force = vars(args)['force']
 
-
-users = load_users()
-if user:
-    users = filter(lambda u:u['name']==user, users)
+#
+# users = load_users()
+# if user:
+#     users = filter(lambda u:u['name']==user, users)
 config = load_config()
-outer_zones = load_zones_outer()
-with open(os.path.join(GEN_PATH, 'zones_desc.json'), 'r') as hr:
-    zones_desc = json.load(hr)
-
-zones_name = {}
-for zone, zone_file in config['zones'].items():
-    country = None
-    for c, r in config['countries'].items():
-        if re.match(r, zone):
-            country = c
-            break
-
-    zones_name[zone] = {
-        'code': zone,
-        'name': zone_file.split('/')[-1].split('.')[0],
-        'country': country
-    }
-for country, cdesc in zones_desc.items():
-    for zone, zdesc in cdesc['zones'].items():
-        zones_name[zdesc['id']] = {
-            'code': zdesc['id'],
-            'name': zone,
-            'country': country
-        }
-
-result_dict = {}
-
-bbi_config = {
-    "count": lambda r: len(r),
-    "eddington": lambda r: eddigton(r, lambda x: x['visited']),
-    "eddington10": lambda r: eddigton(r, lambda x: x['visited'] / 10),
-    "squares": lambda r: sum([z['square'] for z in r.values()]),
-    "eddingtonSquare": lambda r: eddigton(r, lambda x: x['square'])
-}
-bbi_results = []
-
-def eddigton(data, value):
-    eddington = 1
-    while True:
-        if len(list(filter(lambda x: value(x) >= eddington, data.values()))) < eddington:
-            break
-        eddington += 1
-    return eddington - 1
-
-
+# outer_zones = load_zones_outer()
+# with open(os.path.join(GEN_PATH, 'zones_desc.json'), 'r') as hr:
+#     zones_desc = json.load(hr)
+#
+# zones_name = {}
+# for zone, zone_file in config['zones'].items():
+#     country = None
+#     for c, r in config['countries'].items():
+#         if re.match(r, zone):
+#             country = c
+#             break
+#
+#     zones_name[zone] = {
+#         'code': zone,
+#         'name': zone_file.split('/')[-1].split('.')[0],
+#         'country': country
+#     }
+# for country, cdesc in zones_desc.items():
+#     for zone, zdesc in cdesc['zones'].items():
+#         zones_name[zdesc['id']] = {
+#             'code': zdesc['id'],
+#             'name': zone,
+#             'country': country
+#         }
+#
+# result_dict = {}
+#
+# bbi_config = {
+#     "count": lambda r: len(r),
+#     "eddington": lambda r: eddigton(r, lambda x: x['visited']),
+#     "eddington10": lambda r: eddigton(r, lambda x: x['visited'] / 10),
+#     "squares": lambda r: sum([z['square'] for z in r.values()]),
+#     "eddingtonSquare": lambda r: eddigton(r, lambda x: x['square'])
+# }
+# bbi_results = []
+#
+# def eddigton(data, value):
+#     eddington = 1
+#     while True:
+#         if len(list(filter(lambda x: value(x) >= eddington, data.values()))) < eddington:
+#             break
+#         eddington += 1
+#     return eddington - 1
+#
+#
 def generate_user(user):
     user_json_filename = os.path.join(GEN_USERS, user['name'], user['name'] + ".json")
     Path(os.path.join(GEN_USERS, user['name'])).mkdir(exist_ok=True, parents=True)
@@ -162,8 +162,7 @@ def generate_user(user):
 
         if zone_max_square:
             ms1 = coord_from_tile(zone_max_square[0], zone_max_square[1], 14)
-            ms2 = coord_from_tile(zone_max_square[0] + zone_max_square[2], zone_max_square[1] + zone_max_square[2],
-                                  14)
+            ms2 = coord_from_tile(zone_max_square[0] + zone_max_square[2], zone_max_square[1] + zone_max_square[2], 14)
             geometry_square = geojson.Polygon([[
                 [ms1[1], ms1[0]],
                 [ms1[1], ms2[0]],
@@ -202,44 +201,44 @@ def generate_user(user):
         h.write(geojson.dumps(user_result, indent=2))
     return user_result, explored_tiles
 
-geoms_users = []
+# geoms_users = []
 community_tiles = set()
 
 for user in users:
-    result_dict[user['name']], user_tiles = generate_user(user)
-    ur = {'name': user['name'], 'rank': 1}
-    ur.update(result_dict[user['name']]['bbi'])
-    bbi_results.append(ur)
+    _, user_tiles = generate_user(user)
+    # ur = {'name': user['name'], 'rank': 1}
+    # ur.update(result_dict[user['name']]['bbi'])
+    # bbi_results.append(ur)
     community_tiles |= user_tiles
-    geom_z = unary_union([Tile(*t).polygon for t in user_tiles])
-    geoms_users.append(geom_z)
-
-geom_z = unary_union(geoms_users)
-with open(os.path.join(GEN_RESULTS, "kikourou_tiles.geojson"), "w") as h:
-    h.write(geojson.dumps(shapely_to_geojson(geom_z)))
-
-fields_results = {}
-for f in bbi_config.keys():
-    fields_results[f] = sorted([u[f] for u in bbi_results], reverse=True)
-    for user in bbi_results:
-        rank = fields_results[f].index(user[f])
-        user["rank_"+f] = rank + 1
-        user["rank"] += rank
-
-with FileCheck(os.path.join(GEN_PUBLIC_PATH, "users.json")) as hF:
-    hF.write(json.dumps(result_dict, indent=2))
-
-with FileCheck(os.path.join(GEN_PUBLIC_PATH, "bbi.json")) as hF:
-    hF.write(json.dumps(bbi_results, indent=2))
-
-# USERS BY ZONES
-zones_users_results = { k:[] for k in outer_zones.keys()}
-for user in result_dict.values():
-    for zone in user['zones'].values():
-        zones_users_results[zone['zone']['code']].append(zone)
-
-for zone in zones_users_results.values():
-    zone.sort(key=lambda z:z['visited'], reverse=True)
+    # geom_z = unary_union([Tile(*t).polygon for t in user_tiles])
+    # geoms_users.append(geom_z)
+#
+# geom_z = unary_union(geoms_users)
+# with open(os.path.join(GEN_RESULTS, "kikourou_tiles.geojson"), "w") as h:
+#     h.write(geojson.dumps(shapely_to_geojson(geom_z)))
+#
+# fields_results = {}
+# for f in bbi_config.keys():
+#     fields_results[f] = sorted([u[f] for u in bbi_results], reverse=True)
+#     for user in bbi_results:
+#         rank = fields_results[f].index(user[f])
+#         user["rank_"+f] = rank + 1
+#         user["rank"] += rank
+#
+# with FileCheck(os.path.join(GEN_PUBLIC_PATH, "users.json")) as hF:
+#     hF.write(json.dumps(result_dict, indent=2))
+#
+# with FileCheck(os.path.join(GEN_PUBLIC_PATH, "bbi.json")) as hF:
+#     hF.write(json.dumps(bbi_results, indent=2))
+#
+# # USERS BY ZONES
+# zones_users_results = { k:[] for k in outer_zones.keys()}
+# for user in result_dict.values():
+#     for zone in user['zones'].values():
+#         zones_users_results[zone['zone']['code']].append(zone)
+#
+# for zone in zones_users_results.values():
+#     zone.sort(key=lambda z:z['visited'], reverse=True)
 
 
 # COMMUNITY ZONES

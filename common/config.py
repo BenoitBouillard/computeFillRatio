@@ -38,7 +38,7 @@ def load_config():
         with open(os.path.join(GEN_PATH, 'zones_desc.json'), 'r') as hr:
             zones_desc = json.load(hr)
         for country, cc in config['coutries_wikidata'].items():
-            config['countries'][country] = cc['prefix']+"-.*"
+            config['countries'][country] = cc['prefix']+".*"
             if country in zones_desc:
                 for zone, zc in zones_desc[country]['zones'].items():
                     config['zones'][zc['id']] = zc['boundary']['kml']
