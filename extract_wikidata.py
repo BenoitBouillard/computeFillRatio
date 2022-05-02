@@ -99,12 +99,14 @@ if not force:
 
 for country, cc in config['coutries_wikidata'].items():
     print("Process country", country)
-    zones_config[country] = {'name': country, 'zones': {}}
+    if country not in zones_config:
+        zones_config[country] = {'name': country, 'zones': {}}
     res = return_sparql_query_results(cc['wikidata_sparql'])
     for r in res['results']['bindings']:
         zone_name = r['zoneLabel']['value']
         zone_code = r['code']['value']
         if (not force) and (zone_name in zones_config[country]['zones']):
+            print("  Zone", zone_name, "already done")
             continue
 
         zones_config[country]['zones'][zone_name] = {'name': zone_name, 'id': zone_code}
