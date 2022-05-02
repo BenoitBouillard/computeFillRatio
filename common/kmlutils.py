@@ -104,6 +104,31 @@ def kml_file_from_polygons(polygons, kml_file):
         myfile.write(k.to_string(prettyprint=True))
 
 
+def geom2kml(polygons):
+    if not isinstance(polygons, Iterable):
+        polygons = [polygons]
+    # Create the root KML object
+    k = kml.KML()
+    ns = '{http://www.opengis.net/kml/2.2}'
+
+    # Create a KML Document and add it to the KML root object
+    d = kml.Document(ns, 'docid', 'Zone unexplored tiles', 'Zone unexplored tiles')
+    k.append(d)
+
+    # ls = styles.LineStyle(ns, color='red', width=3)
+    # s1 = styles.Style(styles=[ls])
+
+    # Create a Placemark with a simple polygon geometry and add it to the
+    # second folder of the Document
+    for polygon in polygons:
+        # p = kml.Placemark(ns, styles=[s1])
+        p = kml.Placemark(ns)
+        p.geometry = polygon
+        d.append(p)
+
+    return k
+
+
 def create_kml_for_tiles(tiles, kml_file):
     kml_file_from_polygons([Tile(x, y).polygon for (x, y) in tiles], kml_file)
 

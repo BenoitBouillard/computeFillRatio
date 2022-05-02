@@ -12,6 +12,12 @@ $(document).ready(function(){
         zone = urlParams.get('zone')
         country = urlParams.get('country')
         $('span[data-replace="country"]').text(country)
+
+        $('*[data-replace-tag]').each(function(){
+            var tag = $(this).data('replace-tag')
+            $(this).attr(tag, $(this).attr(tag).replace("%country%", country))
+        })
+
         document.title = "[x] "+ zone
     }
 

@@ -2,10 +2,9 @@ import os
 from pathlib import Path
 import json
 
-from common.config import load_users, GEN_PUBLIC_PATH, load_config, GEN_ZONES, GEN_USERS, GEN_RESULTS
+from common.config import load_users, GEN_PUBLIC_PATH, load_config, GEN_ZONES, GEN_USERS, GEN_RESULTS, GEN_PATH
 from common.statshunters import tiles_from_activities
 from common.zones import load_zones_outer
-from fill_ratio import compute_fill_ratio
 from common.fileutils import FileCheck
 from common.squares import get_max_square, compute_max_cluster
 from common.kmlutils import shapely_to_geojson
@@ -31,6 +30,8 @@ if user:
     users = filter(lambda u:u['name']==user, users)
 config = load_config()
 outer_zones = load_zones_outer()
+with open(os.path.join(GEN_PATH, 'zones_desc.json'), 'r') as hr:
+    zones_desc = json.load(hr)
 
 zones_name = {}
 for zone, zone_file in config['zones'].items():
@@ -45,6 +46,13 @@ for zone, zone_file in config['zones'].items():
         'name': zone_file.split('/')[-1].split('.')[0],
         'country': country
     }
+for country, cdesc in zones_desc.items():
+    for zone, zdesc in cdesc['zones'].items():
+        zones_name[zdesc['id']] = {
+            'code': zdesc['id'],
+            'name': zone,
+            'country': country
+        }
 
 result_dict = {}
 

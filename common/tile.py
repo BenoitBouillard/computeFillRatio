@@ -75,3 +75,30 @@ class Tile(object):
     def __repr__(self):
         return "Tile {0.x}_{0.y}".format(self)
 
+
+def geom_to_tiles(geom):
+    tiles_inner = set()
+    tiles_outer = set()
+
+    (min_x, min_y, max_x, max_y) = geom.bounds
+
+    tile_min_x, tile_min_y = tile_from_coord(min_y, min_x)
+    tile_max_x, tile_max_y = tile_from_coord(max_y, max_x)
+    if tile_max_x < tile_min_x:
+        tmp = tile_min_x
+        tile_min_x = tile_max_x
+        tile_max_x = tmp
+    if tile_max_y < tile_min_y:
+        tmp = tile_min_y
+        tile_min_y = tile_max_y
+        tile_max_y = tmp
+    for x in range(tile_min_x, tile_max_x + 1):
+        for y in range(tile_min_y, tile_max_y + 1):
+            t = Tile(x, y)
+            if geom.intersects(t.polygon):
+                tiles_outer.add((x, y))
+                if geom.contains(t.polygon):
+                    tiles_inner.add((x, y))
+    return tiles_inner, tiles_outer
+
+
