@@ -34,11 +34,12 @@ def load_users(only_url=True):
 def load_config():
     with open(CONFIG_FILE, encoding='utf-8') as f:
         config = json.load(f)
-    with open(os.path.join(GEN_PATH, 'zones_desc.json'), 'r') as hr:
-        zones_desc = json.load(hr)
-    for country, cc in config['coutries_wikidata'].items():
-        config['countries'][country] = cc['prefix']+"-.*"
-        if country in zones_desc:
-            for zone, zc in zones_desc[country]['zones'].items():
-                config['zones'][zc['id']] = zc['boundary']['kml']
+    if os.path.exists(os.path.join(GEN_PATH, 'zones_desc.json')):
+        with open(os.path.join(GEN_PATH, 'zones_desc.json'), 'r') as hr:
+            zones_desc = json.load(hr)
+        for country, cc in config['coutries_wikidata'].items():
+            config['countries'][country] = cc['prefix']+"-.*"
+            if country in zones_desc:
+                for zone, zc in zones_desc[country]['zones'].items():
+                    config['zones'][zc['id']] = zc['boundary']['kml']
     return config
