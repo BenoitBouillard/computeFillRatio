@@ -1,3 +1,4 @@
+import argparse
 import os
 import json
 from pathlib import Path
@@ -15,6 +16,11 @@ from common.geojson_utils import shapely_to_geojson
 from common.fileutils import FileCheck
 from common.tile import geom_to_tiles
 
+parser = argparse.ArgumentParser(description='Compute exploration ratio of a zone')
+parser.add_argument('-f', '--force', dest="force", action='store_true', help="Force regeneration")
+args = parser.parse_args()
+
+force = vars(args)['force']
 
 overpass = overpy.Overpass(max_retry_count=5, retry_timeout=30)
 
@@ -84,7 +90,12 @@ def geom_to_geojson(geom, file):
 
 
 config = load_config()
+
 zones_config = {}
+if not force:
+    if os.path.exists(os.path.join(GEN_PATH, 'zones_desc.json')):
+        with open(os.path.join(GEN_PATH, 'zones_desc.json'), 'r') as hr:
+            zones_config = json.load(hr)
 
 for country, cc in config['coutries_wikidata'].items():
     print("Process country", country)
@@ -93,6 +104,9 @@ for country, cc in config['coutries_wikidata'].items():
     for r in res['results']['bindings']:
         zone_name = r['zoneLabel']['value']
         zone_code = r['code']['value']
+        if (not force) and (zone_name in zones_config[country]['zones']):
+            continue
+
         zones_config[country]['zones'][zone_name] = {'name': zone_name, 'id': zone_code}
         print("  Process zone", zone_name)
         admin_geom = get_osm_limits(r['osm_rel']['value'])
@@ -106,6 +120,8 @@ for country, cc in config['coutries_wikidata'].items():
             'outer': list(tiles_outer),
             'inner': list(tiles_inner)
         }
+        with FileCheck(os.path.join(GEN_PATH, 'zones_desc.json')) as hw:
+            json.dump(zones_config, hw)
 
 with FileCheck(os.path.join(GEN_PATH, 'zones_desc.json')) as hw:
     json.dump(zones_config, hw)
