@@ -6,8 +6,10 @@ python3 get_users_activities.py
 # python3 challenge.py -c 2021 -i 12
 # python3 challenge.py -c 2022 -i 2
 # python3 challenge.py -c 2022 -i 3
-python3 challenge.py -c 2022 -i 4
 python3 challenge.py -c 2022 -i 5
+python3 challenge.py -c 2022 -i 6
+python3 challenge.py -c 2022 -i 7
+python3 challenge.py -c 2022 -i 8
 python3 ranking_fill_zones.py
 python3 ranking_fr_stats.py
 python3 ranking_dep.py

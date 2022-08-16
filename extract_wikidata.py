@@ -101,29 +101,33 @@ for country, cc in config['coutries_wikidata'].items():
     print("Process country", country)
     if country not in zones_config:
         zones_config[country] = {'name': country, 'zones': {}}
-    res = return_sparql_query_results(cc['wikidata_sparql'])
-    for r in res['results']['bindings']:
-        zone_name = r['zoneLabel']['value']
-        zone_code = r['code']['value']
-        if (not force) and (zone_name in zones_config[country]['zones']):
-            print("  Zone", zone_name, "already done")
-            continue
+    wikidata_sparqls = cc['wikidata_sparql']
+    if not isinstance(wikidata_sparqls, list):
+        wikidata_sparqls = [wikidata_sparqls]
+    for wikidata_sparql in wikidata_sparqls:
+        res = return_sparql_query_results(wikidata_sparql)
+        for r in res['results']['bindings']:
+            zone_name = r['zoneLabel']['value']
+            zone_code = r['code']['value']
+            if (not force) and (zone_name in zones_config[country]['zones']):
+                print("  Zone", zone_name, "already done")
+                continue
 
-        zones_config[country]['zones'][zone_name] = {'name': zone_name, 'id': zone_code}
-        print("  Process zone", zone_name)
-        admin_geom = get_osm_limits(r['osm_rel']['value'])
-        kml_file = os.path.join(GEN_ZONES, country, zone_name+'.kml')
-        zones_config[country]['zones'][zone_name]['boundary'] = {
-            'kml': geom_to_kml(admin_geom, kml_file),
-            'geojson': geom_to_geojson(admin_geom, os.path.join(GEN_ZONES, country, zone_name+'.geojson'))
-        }
-        tiles_inner, tiles_outer = geom_to_tiles(admin_geom)
-        zones_config[country]['zones'][zone_name]['tiles'] = {
-            'outer': list(tiles_outer),
-            'inner': list(tiles_inner)
-        }
-        with FileCheck(os.path.join(GEN_PATH, 'zones_desc.json')) as hw:
-            json.dump(zones_config, hw)
+            zones_config[country]['zones'][zone_name] = {'name': zone_name, 'id': zone_code}
+            print("  Process zone", zone_name)
+            admin_geom = get_osm_limits(r['osm_rel']['value'])
+            kml_file = os.path.join(GEN_ZONES, country, zone_name+'.kml')
+            zones_config[country]['zones'][zone_name]['boundary'] = {
+                'kml': geom_to_kml(admin_geom, kml_file),
+                'geojson': geom_to_geojson(admin_geom, os.path.join(GEN_ZONES, country, zone_name+'.geojson'))
+            }
+            tiles_inner, tiles_outer = geom_to_tiles(admin_geom)
+            zones_config[country]['zones'][zone_name]['tiles'] = {
+                'outer': list(tiles_outer),
+                'inner': list(tiles_inner)
+            }
+            with FileCheck(os.path.join(GEN_PATH, 'zones_desc.json')) as hw:
+                json.dump(zones_config, hw)
 
 with FileCheck(os.path.join(GEN_PATH, 'zones_desc.json')) as hw:
     json.dump(zones_config, hw)
