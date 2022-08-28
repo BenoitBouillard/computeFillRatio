@@ -7,6 +7,7 @@ from common.squares import compute_max_square
 from common.statshunters import tiles_from_activities
 from common.zones import load_zones_outer
 from common.fileutils import FileCheck
+from gen_tiles import gen_json_tiles
 
 outer_zones = load_zones_outer()
 users = load_users()
@@ -21,6 +22,8 @@ for user in users:
     url_uid = user['url'].split('/')[-1]
     explored_tiles = tiles_from_activities(url_uid, filter_fct=lambda act: 'Virtual' not in act['type'])
     dep_explorer = []
+
+    gen_json_tiles(user['name'], explored_tiles)
 
     for zone in outer_zones:
         explored_tiles_zone = outer_zones[zone] & explored_tiles
