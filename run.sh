@@ -2,7 +2,7 @@
 
 git pull
 pip3 install -r requirements.txt
-python3 get_users_activities.py
+python3 get_users_activities.py -f
 # python3 challenge.py -c 2021 -i 12
 # python3 challenge.py -c 2022 -i 2
 # python3 challenge.py -c 2022 -i 3
