@@ -41,5 +41,6 @@ def load_config():
             config['countries'][country] = cc['prefix']+".*"
             if country in zones_desc:
                 for zone, zc in zones_desc[country]['zones'].items():
-                    config['zones'][zc['id']] = zc['boundary']['kml']
+                    if 'boundary' in zc:
+                        config['zones'][zc['id']] = zc['boundary']['kml']
     return config

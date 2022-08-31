@@ -19,9 +19,8 @@ def gen_json_tiles(name, tiles, level=14):
             tiles_dict[tile[0]] = []
         tiles_dict[tile[0]].append(tile[1])
 
-    Path("static/gen/users/{0}".format(name, level)).mkdir(exist_ok=True, parents=True)
-    #with open("static/gen/users/{0}/tiles_{1}.json".format(name, level), "w") as h:
-    with FileCheck("static/gen/users/{0}/tiles_{1}.json".format(name, level)) as h:
+    Path("static/gen/tiles_sh/{0}".format(name, level)).mkdir(exist_ok=True, parents=True)
+    with FileCheck("static/gen/tiles_sh/{0}/tiles_{1}.json".format(name, level)) as h:
         json.dump(tiles_dict, h)
 
     return tiles

@@ -56,7 +56,10 @@ def create_kml_for_placemark(placemark):
 
 def get_osm_limits(rel):
     result = overpass.query("rel({});out skel geom;".format(rel))
-    relation = result.get_relations()[0]
+    try:
+        relation = result.get_relations()[0]
+    except:
+        return None
     boundary_osm_url = 'https://www.openstreetmap.org/relation/{}'.format(rel)
     print("boundary_osm_url : ", boundary_osm_url)
     inners = [geometry.LineString([(g.lon, g.lat) for g in m.geometry]) for m in relation.members if m.role == 'inner']
@@ -113,9 +116,13 @@ for country, cc in config['coutries_wikidata'].items():
                 print("  Zone", zone_name, "already done")
                 continue
 
-            zones_config[country]['zones'][zone_name] = {'name': zone_name, 'id': zone_code}
             print("  Process zone", zone_name)
             admin_geom = get_osm_limits(r['osm_rel']['value'])
+            if admin_geom is None:
+                print("    !!! relation error !!!")
+                continue
+            zones_config[country]['zones'][zone_name] = {'name': zone_name, 'id': zone_code}
+
             kml_file = os.path.join(GEN_ZONES, country, zone_name+'.kml')
             zones_config[country]['zones'][zone_name]['boundary'] = {
                 'kml': geom_to_kml(admin_geom, kml_file),

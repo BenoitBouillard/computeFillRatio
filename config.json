@@ -266,6 +266,10 @@
         "SELECT ?zone ?zoneLabel ?code ?osm_rel\nWHERE \n{\n  ?zone wdt:P31 wd:Q162620.\n  ?zone p:P31 ?rel.\n  ?rel ps:P31 wd:Q162620.\n  FILTER NOT EXISTS { ?rel pq:P582 ?x }.\n  ?zone wdt:P300 ?code.\n  ?zone wdt:P402 ?osm_rel.\n  \n  SERVICE wikibase:label {\n    bd:serviceParam wikibase:language \"fr\",\"en\" .\n  }\n}",
         "SELECT ?zone ?zoneLabel ?code ?osm_rel\nWHERE \n{\n  VALUES ?zone { wd:Q5756 wd:Q4018 }\n  ?zone wdt:P300 ?code.\n  ?zone wdt:P402 ?osm_rel.\n  \n  SERVICE wikibase:label {\n    bd:serviceParam wikibase:language \"fr\",\"en\" .\n  }\n}"
       ]
+    },
+    "Italie": {
+      "prefix": "IT",
+      "wikidata_sparql": "SELECT ?zone ?zoneLabel ?code ?osm_rel\nWHERE \n{\n  ?zone wdt:P31 wd:Q15089.\n  ?zone p:P31 ?rel.\n  ?rel ps:P31 wd:Q15089.\n  FILTER NOT EXISTS { ?rel pq:P582 ?x }.\n  ?zone wdt:P300 ?code.\n  ?zone wdt:P402 ?osm_rel.\n  \n  SERVICE wikibase:label {\n    bd:serviceParam wikibase:language \"fr\",\"en\" .\n  }\n}"
     }
   },
   "to_check": {
