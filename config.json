@@ -269,7 +269,11 @@
     },
     "Italie": {
       "prefix": "IT",
-      "wikidata_sparql": "SELECT ?zone ?zoneLabel ?code ?osm_rel\nWHERE \n{\n  ?zone wdt:P31 wd:Q16110.\n  ?zone p:P31 ?rel.\n  ?rel ps:P31 wd:Q16110.\n  FILTER NOT EXISTS { ?rel pq:P582 ?x }.\n  ?zone wdt:P300 ?code.\n  ?zone wdt:P402 ?osm_rel.\n  \n  SERVICE wikibase:label {\n    bd:serviceParam wikibase:language \"fr\",\"en\" .\n  }\n}"
+      "wikidata_sparql": "SELECT ?zone ?rel ?zoneLabel ?code ?osm_rel\nWHERE\n{\n  { ?zone wdt:P31 wd:Q16110.}\n  UNION\n  { ?zone wdt:P31 wd:Q1710033. }\n  ?zone p:P31 ?rel.\n  \n  { ?rel ps:P31 wd:Q16110.}\n  UNION\n  { ?rel ps:P31 wd:Q1710033. }\n\n  FILTER NOT EXISTS { ?rel pq:P582 ?x }.\n  ?zone wdt:P300 ?code.\n  ?zone wdt:P402 ?osm_rel.\n \n  SERVICE wikibase:label {\n    bd:serviceParam wikibase:language \"fr\",\"en\" .\n  }\n}\n"
+    },
+    "Pays-Bas": {
+      "prefix": "NL",
+      "wikidata_sparql": "SELECT ?zone ?zoneLabel ?code ?osm_rel\nWHERE \n{\n  ?zone wdt:P31 wd:Q134390.\n  ?zone p:P31 ?rel.\n  ?rel ps:P31 wd:Q134390.\n  FILTER NOT EXISTS { ?rel pq:P582 ?x }.\n  ?zone wdt:P300 ?code.\n  ?zone wdt:P402 ?osm_rel.\n  \n  SERVICE wikibase:label {\n    bd:serviceParam wikibase:language \"fr\",\"en\" .\n  }\n}"
     }
   },
   "to_check": {

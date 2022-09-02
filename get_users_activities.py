@@ -19,7 +19,8 @@ def get_users_activities(full=True, name=None):
         url_uid = user['url'].split('/')[-1]
         user_data_path = os.path.join(GEN_USER_DATA, url_uid)
         date = get_statshunters_user_activities(user_data_path, user['url'], full=full)
-        last_activity_dates[user['name']] = date
+        if date:
+            last_activity_dates[user['name']] = date
 
     from collections import OrderedDict
     last_activity_dates = OrderedDict(sorted(last_activity_dates.items(), key=lambda kvp: kvp[1], reverse=True))

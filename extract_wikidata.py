@@ -100,7 +100,7 @@ if not force:
         with open(os.path.join(GEN_PATH, 'zones_desc.json'), 'r') as hr:
             zones_config = json.load(hr)
 
-zones_config["Italie"] = {'name': "Italie", 'zones': {}}
+#zones_config["Italie"] = {'name': "Italie", 'zones': {}}
 
 for country, cc in config['coutries_wikidata'].items():
     print("Process country", country)
