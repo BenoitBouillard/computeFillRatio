@@ -19,13 +19,16 @@ def get_statshunters_user_activities(path, sharelink, full=False):
         filepath = os.path.join(path, "activities_{}.json".format(page))
         url = sharelink + "/api/activities?page={0}".format(page)
         print("Get page {} ({})".format(page, url))
-        my_urlretrieve(url, filepath)
-        with open(filepath) as f:
-            d = json.load(f)
-            if len(d['activities']) == 0:
-                break
-            last_activity = d['activities'][-1]['date']
-        page += 1
+        try:
+            my_urlretrieve(url, filepath)
+            with open(filepath) as f:
+                d = json.load(f)
+                if len(d['activities']) == 0:
+                    break
+                last_activity = d['activities'][-1]['date']
+            page += 1
+        except:
+            break
     print("Last activity:", last_activity)
 
     return last_activity
