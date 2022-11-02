@@ -47,6 +47,6 @@ def retry(exception_to_check, tries=4, delay=3, backoff=2, logger=None):
     return deco_retry
 
 
-@retry(Exception, tries=6, delay=60, backoff=2)
+@retry(Exception, tries=4, delay=30, backoff=2)
 def my_urlretrieve(url, filename=None, reporthook=None, data=None):
     return urlretrieve(url, filename, reporthook, data)
