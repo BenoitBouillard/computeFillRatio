@@ -32,6 +32,16 @@ export const consts = {
             style: 'normal'
         },
         {
+            name: "Lim. Adm.",
+            url: 'https://wxs.ign.fr/{apikey}/geoportail/wmts?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&STYLE={style}&TILEMATRIXSET=PM&FORMAT={format}&LAYER={layer}&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}',
+            attribution: false,
+            maxZoom: 16,
+            apikey: 'an7nvfzojv5wa96dsga5nk8w',
+            layer: 'LIMITES_ADMINISTRATIVES_EXPRESS.LATEST',
+            format: 'image/png',
+            style: 'normal'
+        },
+        {
             name: "Google Maps",
             url: 'http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
             subdomains:['mt0','mt1','mt2','mt3'],
