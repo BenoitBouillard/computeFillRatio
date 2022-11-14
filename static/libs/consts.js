@@ -22,16 +22,6 @@ export const consts = {
             url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png'
         },
         {
-            name: "IGN carte",
-            url: 'https://wxs.ign.fr/{apikey}/geoportail/wmts?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&STYLE={style}&TILEMATRIXSET=PM&FORMAT={format}&LAYER={layer}&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}',
-            attribution: false,
-            maxZoom: 19,
-            apikey: 'choisirgeoportail',
-            layer: 'GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2',
-            format: 'image/png',
-            style: 'normal'
-        },
-        {
             name: "Lim. Adm.",
             url: 'https://wxs.ign.fr/{apikey}/geoportail/wmts?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&STYLE={style}&TILEMATRIXSET=PM&FORMAT={format}&LAYER={layer}&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}',
             attribution: false,
@@ -40,13 +30,6 @@ export const consts = {
             layer: 'LIMITES_ADMINISTRATIVES_EXPRESS.LATEST',
             format: 'image/png',
             style: 'normal'
-        },
-        {
-            name: "Google Maps",
-            url: 'http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
-            subdomains:['mt0','mt1','mt2','mt3'],
-            attribution: false,
-            maxZoom: 20
         },
         {
             name: "IGN Cassini",
@@ -59,6 +42,16 @@ export const consts = {
             style: 'normal'
         },
         {
+            name: "IGN carte",
+            url: 'https://wxs.ign.fr/{apikey}/geoportail/wmts?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&STYLE={style}&TILEMATRIXSET=PM&FORMAT={format}&LAYER={layer}&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}',
+            attribution: false,
+            maxZoom: 19,
+            apikey: 'choisirgeoportail',
+            layer: 'GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2',
+            format: 'image/png',
+            style: 'normal'
+        },
+        {
             name: "IGN Sat.",
             url: 'https://wxs.ign.fr/{apikey}/geoportail/wmts?service=WMTS&request=GetTile&version=1.0.0&tilematrixset=PM&tilematrix={z}&tilecol={x}&tilerow={y}&layer=ORTHOIMAGERY.ORTHOPHOTOS&format=image/jpeg&style=normal',
             attribution: false,
@@ -66,6 +59,13 @@ export const consts = {
             apikey: 'choisirgeoportail',
             format: 'image/jpeg',
             style: 'normal'
+        },
+        {
+            name: "Google Maps",
+            url: 'http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+            subdomains:['mt0','mt1','mt2','mt3'],
+            attribution: false,
+            maxZoom: 20
         },
         {
             name: "Google Sat.",
