@@ -4,6 +4,7 @@ import re
 from collections import OrderedDict
 from datetime import datetime
 from pathlib import Path
+import json
 
 from common import statshunters
 from common.config import load_users, load_config, GEN_RESULTS
@@ -43,10 +44,6 @@ def compute_challenges(challenge_str=None, index=None):
             return False
 
         users = list(filter(lambda u: challenge_config.get('user_default', False) or check_chalenges(challenge, u.get('challenges', [])), users_json))
-
-        compare = challenge_config.get('compare', False)
-        if not isinstance(compare, bool):
-            compare = eval(compare, {}, {'index': index})
 
         sort_fields = challenge_config.get('sort', [])
         sort_fields += [f for f in FIELDS if f not in sort_fields]
@@ -98,82 +95,114 @@ def compute_challenges(challenge_str=None, index=None):
                 rank += 1
             return results
 
-        users_results = compute_results(users, index)
+        if index is not None:
 
-        users = list(filter(lambda u: users_results[u['name']]['activities'] is None or users_results[u['name']]['activities'] > 0, users))
-        users_results = OrderedDict(filter(lambda kvp: kvp[1]['activities'] is None or kvp[1]['activities'] > 0, users_results.items()))
+            users_results = compute_results(users, index)
 
-        if compare:
-            users_results_prev = compute_results(users, index - 1)
-            for userName in users_results_prev:
-                users_results[userName]["rank_diff"] = users_results_prev[userName]['rank'] - \
-                                                           users_results[userName]['rank']
-                for field in FIELDS:
-                    if users_results[userName][field] is not None:
-                        users_results[userName][field + "_diff"] = users_results[userName][field] - \
-                                                                   users_results_prev[userName][field]
+            users = list(filter(lambda u: users_results[u['name']]['activities'] is None or users_results[u['name']]['activities'] > 0, users))
+            users_results = OrderedDict(filter(lambda kvp: kvp[1]['activities'] is None or kvp[1]['activities'] > 0, users_results.items()))
 
-        gen_challenge = os.path.join(GEN_CHALLENGES, challenge)
-        Path(gen_challenge).mkdir(exist_ok=True, parents=True)
-
-        with FileCheck(os.path.join(gen_challenge, '{}_{:02}.txt'.format(challenge, index))) as h:
+            compare = challenge_config.get('compare', False)
+            if not isinstance(compare, bool):
+                compare = eval(compare, {}, {'index': index})
 
             if compare:
-                format_str = "{0:<2} {2:>4} {1:<16}"
-            else:
-                format_str = "{0:<2} {1:<16}"
+                users_results_prev = compute_results(users, index - 1)
+                for userName in users_results_prev:
+                    users_results[userName]["rank_diff"] = users_results_prev[userName]['rank'] - \
+                                                               users_results[userName]['rank']
+                    for field in FIELDS:
+                        if users_results[userName][field] is not None:
+                            users_results[userName][field + "_diff"] = users_results[userName][field] - \
+                                                                       users_results_prev[userName][field]
 
-            header = format_str.format("##", "Name", "Diff")
+            gen_challenge = os.path.join(GEN_CHALLENGES, challenge)
+            Path(gen_challenge).mkdir(exist_ok=True, parents=True)
 
-            for sf in sort_fields:
+            with FileCheck(os.path.join(gen_challenge, '{}_{:02}.txt'.format(challenge, index))) as h:
+
                 if compare:
-                    header += " {:^11}".format(sf)
+                    format_str = "{0:<2} {2:>4} {1:<16}"
                 else:
-                    line = " {:>5}".format(sf)
-                    line += " " * (11 - len(line))
-                    header += line
+                    format_str = "{0:<2} {1:<16}"
 
-            print(header)
-            h.write(header+"\n")
-
-            rank = 1
-            for user, result in users_results.items():
-                kml_file_name = os.path.join(gen_challenge, "{0}_{1}_unvisited.kml".format(challenge, result['user']))
-
-                if 'tiles_set' in result and result['cluster']>0:
-                    with FileCheck(kml_file_name) as hkml:
-                        hkml.write(gen_kml_unvisited(result['tiles_set'], 14).to_string())
-                if compare:
-                    line_str = format_str.format(result['rank'], result['user'], "({:+2})".format(result["rank_diff"]))
-                else:
-                    line_str = format_str.format(result['rank'], result['user'], "")
+                header = format_str.format("##", "Name", "Diff")
 
                 for sf in sort_fields:
-                    if result[sf] is None:
-                        line = "   ???"
-                        if compare:
-                            line += "     "
+                    if compare:
+                        header += " {:^11}".format(sf)
                     else:
-                        line = " {:>5.0f}".format(result[sf])
-                        if compare:
-                            p = "({:+4.0f})".format(result[sf + "_diff"])
-                            if len(p) < 6:
-                                p += " " * (6 - len(p))
-                            line += p
+                        line = " {:>5}".format(sf)
+                        line += " " * (11 - len(line))
+                        header += line
+
+                print(header)
+                h.write(header+"\n")
+
+                rank = 1
+                for user, result in users_results.items():
+                    kml_file_name = os.path.join(gen_challenge, "{0}_{1}_unvisited.kml".format(challenge, result['user']))
+
+                    if 'tiles_set' in result and result['cluster']>0:
+                        with FileCheck(kml_file_name) as hkml:
+                            hkml.write(gen_kml_unvisited(result['tiles_set'], 14).to_string())
+                    if compare:
+                        line_str = format_str.format(result['rank'], result['user'], "({:+2})".format(result["rank_diff"]))
+                    else:
+                        line_str = format_str.format(result['rank'], result['user'], "")
+
+                    for sf in sort_fields:
+                        if result[sf] is None:
+                            line = "   ???"
+                            if compare:
+                                line += "     "
                         else:
-                            line += "     "
+                            line = " {:>5.0f}".format(result[sf])
+                            if compare:
+                                p = "({:+4.0f})".format(result[sf + "_diff"])
+                                if len(p) < 6:
+                                    p += " " * (6 - len(p))
+                                line += p
+                            else:
+                                line += "     "
 
-                    line_str += line
+                        line_str += line
 
-                print(line_str)
-                h.write(line_str+"\n")
-                rank += 1
+                    print(line_str)
+                    h.write(line_str+"\n")
+                    rank += 1
+        else:
+            results = {}
+            for month in range(1,13):
+                users_results = compute_results(users, month)
 
+                users = list(filter(
+                    lambda u: users_results[u['name']]['activities'] is None or users_results[u['name']][
+                        'activities'] > 0, users))
+                users_results = dict(filter(lambda kvp: kvp[1]['activities'] is None or kvp[1]['activities'] > 0, users_results.items()))
+                for user, result in users_results.items():
+                    if user not in results:
+                        results[user] = {}
+                    results[user][month] = {f: result[f] for f in FIELDS}
+
+            gen_challenge = os.path.join(GEN_CHALLENGES)
+            gen_challenge_file = challenge+".json"
+            Path(gen_challenge).mkdir(exist_ok=True, parents=True)
+            with FileCheck(os.path.join(gen_challenge, gen_challenge_file)) as hF:
+                hF.write(json.dumps(results, indent=2))
+            try:
+                with open(os.path.join(gen_challenge, "challenges.json")) as hR:
+                    challenges_list = json.load((hR))
+            except:
+                challenges_list = {}
+            challenges_list[challenge] = gen_challenge_file
+            with FileCheck(os.path.join(gen_challenge, "challenges.json")) as hF:
+                hF.write(json.dumps(challenges_list, indent=2))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Compute challenge stats')
     parser.add_argument('-c', '--challenge', dest="challenge", help="Challenges to compute")
-    parser.add_argument('-i', '--index', dest="index", type=int, default=1, help="index of computation (ie month)")
+    parser.add_argument('-i', '--index', dest="index", type=int, default=None, help="index of computation (ie month)")
 
     args = parser.parse_args()
 
