@@ -27,7 +27,7 @@ force = vars(args)['force']
 
 users = load_users()
 if user:
-    users = filter(lambda u:u['name']==user, users)
+    users = filter(lambda u: u['name'] == user, users)
 config = load_config()
 outer_zones = load_zones_outer()
 with open(os.path.join(GEN_PATH, 'zones_desc.json'), 'r') as hr:
@@ -65,6 +65,7 @@ bbi_config = {
 }
 bbi_results = []
 
+
 def eddigton(data, value):
     eddington = 1
     while True:
@@ -85,7 +86,6 @@ def generate_user(user):
             previous_result = json.load(hr)
     except:
         previous_result = None
-
 
     if (not force) and previous_result:
         if previous_result.get("visited", 0) == len(explored_tiles):
