@@ -14,7 +14,7 @@ $(document).ready(function(){
             }
         },
         post_action_tr: function(tr, data) {
-            $(`<td><a target="_blank" href="map.html?user=${data.user}">carte</a></td>`).appendTo(tr)
+            $(`<td><a target="_blank" href="map.html?title=${data.user}&geojson=${data.geojson}">carte</a></td>`).appendTo(tr)
         }
 
     })

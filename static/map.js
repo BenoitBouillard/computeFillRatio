@@ -29,31 +29,17 @@ import {styles, consts} from "./libs/consts.js?version=1.5"
 
 $(document).ready(function(){
 
-    // ############ USER NAME ############
-    var user = false;
-    var zone = false;
-    var geojson_file = "gen/results/kikourou_tiles.geojson";
+    // ############ PARAMS TITLE & GEOJSON ############
+    var geojson_file = null
+    var title = null
     {
         const queryString = window.location.search
         const urlParams = new URLSearchParams(queryString);
-        user = urlParams.get('user')
-        zone = urlParams.get('zone')
-        if (user) {
-            if (zone) {
-                geojson_file = "gen/users/" + user + "/" + user+ "_" + zone + ".geojson";
-                document.title = "[x] "+ user + " (" + zone + ")"
-            } else {
-                geojson_file = "gen/users/" + user + "/" + user + ".geojson";
-                document.title = "[x] carte "+ user
-            }
-        } else {
-            document.title = "[x] carte Kikourou"
-        }
-
-        $('#name').text(user)
+        geojson_file = urlParams.get('geojson')
+        title = urlParams.get('title')
+        document.title = "[x] carte "+title
+        $("#title").html(title)
     }
-
-
 
     // ############ MAP ############
     var mymap = L.map('content', {zoomSnap: 0.5, zoomDelta:0.5, attributionControl: false});

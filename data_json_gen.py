@@ -2,7 +2,8 @@ import os
 from pathlib import Path
 import json
 
-from common.config import load_users, GEN_PUBLIC_PATH, load_config, GEN_ZONES, GEN_USERS, GEN_RESULTS, GEN_PATH
+from common.config import load_users, GEN_PUBLIC_PATH, load_config, GEN_ZONES, GEN_USERS, GEN_RESULTS, GEN_PATH, \
+    PUBLIC_PATH
 from common.statshunters import tiles_from_activities
 from common.zones import load_zones_outer
 from common.fileutils import FileCheck
@@ -126,7 +127,7 @@ def generate_user(user):
         'visited': len(explored_tiles),
         'square': max_square[2],
         'cluster': len(cluster),
-        'geojson': geojson_filename,
+        'geojson': os.path.relpath(geojson_filename, PUBLIC_PATH),
         'zones': {}
     }
     for zone in outer_zones:
@@ -191,7 +192,7 @@ def generate_user(user):
             'total': len(zone_tiles),
             'ratio': round(100.0 * len(explored_tiles_zone) / len(zone_tiles), 2),
             'square': zone_max_square[2],
-            'geojson': geojson_filename
+            'geojson': os.path.relpath(geojson_filename, PUBLIC_PATH)
         }
 
     # BBI
@@ -259,11 +260,47 @@ for country in config['countries']:
         community_tiles_zone = community_tiles_country & c_outer_zones[zone]
         zone_results.append([zone, len(community_tiles_zone), len(c_outer_zones[zone]),
                              len(community_tiles_zone) / len(c_outer_zones[zone]) * 100])
+
+
+
+        sc = []
+        zone_tiles = c_outer_zones[zone]
+        explored_tiles_zone = community_tiles_zone
+        non_explored_tiles_zone = zone_tiles - explored_tiles_zone
+
+        explored_geojson = shapely_to_geojson(unary_union([Tile(*t).polygon for t in explored_tiles_zone]))
+        non_explored_geojson = shapely_to_geojson(
+            geometry.MultiPolygon([Tile(*t).polygon for t in non_explored_tiles_zone]))
+
+        geojson_filename = config['zones'][zone].replace("%GEN_ZONES%", GEN_ZONES).replace('.kml', '_community.geojson')
+
+        path = config['zones'][zone].replace("%GEN_ZONES%", GEN_ZONES).replace('.kml', '.geojson')
+        with open(path, 'r') as fP:
+            limit = geojson.load(fP)
+            sc.append(geojson.Feature(geometry=limit, properties= {"kind": "zone_limit"}))
+
+        sc.append(geojson.Feature(geometry=non_explored_geojson,
+                                  properties={"kind": "unvisited",
+                                              "size": len(non_explored_tiles_zone)
+                                              }))
+
+        sc.append(geojson.Feature(geometry=explored_geojson,
+                                  properties={"kind": "visited",
+                                              "size": len(explored_tiles_zone)
+                                              }))
+
+        geojson_collection = geojson.FeatureCollection(sc)
+
+        with FileCheck(geojson_filename) as h:
+            h.write(geojson.dumps(geojson_collection))
+
+
         community_zones[country]['zones'][zone] = {
             'zone': zones_name[zone],
             'visited': len(community_tiles_zone),
             'size': len(c_outer_zones[zone]),
-            'users': zones_users_results.get(zone, [])
+            'users': zones_users_results.get(zone, []),
+            'geojson': os.path.relpath(geojson_filename, PUBLIC_PATH)
         }
 
     community_zones[country]['all'] = {

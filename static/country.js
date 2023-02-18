@@ -75,21 +75,22 @@ $(document).ready(function(){
             },
             'user_1': function(td, data) {
                 if (data.users.length >= 1) {
-                    $(td).wrapInner(`<a target="_blank" href="map.html?user=${data.users[0].user}&zone=${data.zone.code}"></a>`)
+                    $(td).wrapInner(`<a target="_blank" href="map.html?title=${data.zone.name} pour ${data.users[0].user}&geojson=${data.users[0].geojson}"></a>`)
                 }
             },
             'user_2': function(td, data) {
                 if (data.users.length >= 2) {
-                    $(td).wrapInner(`<a target="_blank" href="map.html?user=${data.users[1].user}&zone=${data.zone.code}"></a>`)
+                    $(td).wrapInner(`<a target="_blank" href="map.html?title=${data.zone.name} pour ${data.users[1].user}&geojson=${data.users[1].geojson}"></a>`)
                 }
             },
             'user_3': function(td, data) {
                 if (data.users.length >= 3) {
-                    $(td).wrapInner(`<a target="_blank" href="map.html?user=${data.users[2].user}&zone=${data.zone.code}"></a>`)
+                    $(td).wrapInner(`<a target="_blank" href="map.html?title=${data.zone.name} pour ${data.users[2].user}&geojson=${data.users[2].geojson}"></a>`)
                 }
             },
         },
         post_action_tr: function(tr, data) {
+            $(`<td><a target="_blank" href="map.html?title=Communauté pour ${data.zone.name}&geojson=${data.geojson}">carte</a></td>`).appendTo(tr)
         }
     }
 
