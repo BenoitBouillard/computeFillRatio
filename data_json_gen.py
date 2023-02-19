@@ -29,6 +29,7 @@ force = vars(args)['force']
 users = load_users()
 if user:
     users = filter(lambda u: u['name'] == user, users)
+
 config = load_config()
 outer_zones = load_zones_outer()
 with open(os.path.join(GEN_PATH, 'zones_desc.json'), 'r') as hr:
@@ -67,6 +68,38 @@ bbi_config = {
 bbi_results = []
 
 
+def gen_geojson(output_file, explored_tiles=None, zone_tiles=None, limits_file=None, max_square=None, cluster=None):
+    sc = []
+    if limits_file:
+        with open(limits_file, 'r') as fP:
+            limit = geojson.load(fP)
+            sc.append(geojson.Feature(geometry=limit, properties={"kind": "zone_limit"}))
+
+    if zone_tiles:
+        non_explored_tiles_zone = zone_tiles - explored_tiles
+        non_explored_geojson = shapely_to_geojson(geometry.MultiPolygon([Tile(*t).polygon for t in non_explored_tiles_zone]))
+        sc.append(geojson.Feature(geometry=non_explored_geojson,
+                                  properties={"kind": "unvisited", "size": len(non_explored_tiles_zone) }))
+    explored_geojson = shapely_to_geojson(unary_union([Tile(*t).polygon for t in explored_tiles]))
+    sc.append(geojson.Feature(geometry=explored_geojson,
+                              properties={"kind": "visited", "size": len(explored_tiles) }))
+    if cluster:
+        explored_geojson = shapely_to_geojson(unary_union([Tile(*t).polygon for t in cluster]))
+        sc.append(geojson.Feature(geometry=explored_geojson,
+                                  properties={"kind": "cluster", "size": len(cluster) }))
+    if max_square:
+        ms1 = coord_from_tile(max_square[0], max_square[1], 14)
+        ms2 = coord_from_tile(max_square[0] + max_square[2], max_square[1] + max_square[2], 14)
+        geometry_square = geojson.Polygon([[
+            [ms1[1], ms1[0]], [ms1[1], ms2[0]], [ms2[1], ms2[0]],[ms2[1], ms1[0]], [ms1[1], ms1[0]]
+        ]])
+
+        sc.append(geojson.Feature( geometry=geometry_square, properties={"kind": "max_square", "size": max_square[2]}))
+
+    with FileCheck(output_file) as h:
+        h.write(geojson.dumps(output_file))
+
+
 def eddigton(data, value):
     eddington = 1
     while True:
@@ -97,31 +130,8 @@ def generate_user(user):
     max_square = get_max_square(explored_tiles)
     cluster = compute_max_cluster(explored_tiles)
     geojson_filename = os.path.join(GEN_USERS, user['name'], user['name'] + ".geojson")
-    sc = []
-    explored_geojson = shapely_to_geojson(unary_union([Tile(*t).polygon for t in explored_tiles]))
-    sc.append(geojson.Feature(geometry=explored_geojson,
-                              properties={"kind": "visited",
-                                          "size": len(explored_tiles)
-                                          }))
-    explored_geojson = shapely_to_geojson(unary_union([Tile(*t).polygon for t in cluster]))
-    sc.append(geojson.Feature(geometry=explored_geojson,
-                              properties={"kind": "cluster",
-                                          "size": len(cluster)
-                                          }))
-    ms1 = coord_from_tile(max_square[0], max_square[1], 14)
-    ms2 = coord_from_tile(max_square[0] + max_square[2], max_square[1] + max_square[2], 14)
-    geometry_square = geojson.Polygon([[
-        [ms1[1], ms1[0]], [ms1[1], ms2[0]], [ms2[1], ms2[0]], [ms2[1], ms1[0]], [ms1[1], ms1[0]]
-    ]])
-    sc.append(geojson.Feature(
-        geometry=geometry_square,
-        properties={"kind": "max_square",
-                    "size": max_square[2]
-                    }
-    ))
-    geojson_collection = geojson.FeatureCollection(sc)
-    with FileCheck(geojson_filename) as h:
-        h.write(geojson.dumps(geojson_collection))
+    gen_geojson(geojson_filename, explored_tiles=explored_tiles, limits_file=None, max_square=max_square, cluster=cluster)
+
     user_result = {
         'user': user['name'],
         'visited': len(explored_tiles),
@@ -131,59 +141,28 @@ def generate_user(user):
         'zones': {}
     }
     for zone in outer_zones:
-        sc = []
 
         zone_tiles = outer_zones[zone]
         explored_tiles_zone = zone_tiles & explored_tiles
         if not explored_tiles_zone:
             continue
-        non_explored_tiles_zone = zone_tiles - explored_tiles_zone
-        zone_max_square = get_max_square(explored_tiles_zone)
 
-        explored_geojson = shapely_to_geojson(unary_union([Tile(*t).polygon for t in explored_tiles_zone]))
-        non_explored_geojson = shapely_to_geojson(
-            geometry.MultiPolygon([Tile(*t).polygon for t in non_explored_tiles_zone]))
+        if not force:
+            try:
+                if previous_result['zones'][zone]['visited'] == len(explored_tiles_zone):
+                    # no change
+                    print("No change for " + user['name'] + " / " + zone)
+                    user_result['zones'][zone] = previous_result['zones'][zone]
+                    continue
+            except:
+                pass
+
+        zone_max_square = get_max_square(explored_tiles_zone)
+        path = config['zones'][zone].replace("%GEN_ZONES%", GEN_ZONES).replace('.kml', '.geojson')
 
         geojson_filename = os.path.join(GEN_USERS, user['name'], user['name'] + '_' + zone + ".geojson")
-
-        path = config['zones'][zone].replace("%GEN_ZONES%", GEN_ZONES).replace('.kml', '.geojson')
-        with open(path, 'r') as fP:
-            limit = geojson.load(fP)
-            sc.append(geojson.Feature(geometry=limit, properties= {"kind": "zone_limit"}))
-
-        sc.append(geojson.Feature(geometry=non_explored_geojson,
-                                  properties={"kind": "unvisited",
-                                              "size": len(non_explored_tiles_zone)
-                                              }))
-
-        sc.append(geojson.Feature(geometry=explored_geojson,
-                                  properties={"kind": "visited",
-                                              "size": len(explored_tiles_zone)
-                                              }))
-
-        if zone_max_square:
-            ms1 = coord_from_tile(zone_max_square[0], zone_max_square[1], 14)
-            ms2 = coord_from_tile(zone_max_square[0] + zone_max_square[2], zone_max_square[1] + zone_max_square[2],
-                                  14)
-            geometry_square = geojson.Polygon([[
-                [ms1[1], ms1[0]],
-                [ms1[1], ms2[0]],
-                [ms2[1], ms2[0]],
-                [ms2[1], ms1[0]],
-                [ms1[1], ms1[0]]
-            ]])
-
-            sc.append(geojson.Feature(
-                geometry=geometry_square,
-                properties={"kind": "max_square",
-                            "size": zone_max_square[2]
-                            }
-            ))
-
-        geojson_collection = geojson.FeatureCollection(sc)
-
-        with FileCheck(geojson_filename) as h:
-            h.write(geojson.dumps(geojson_collection))
+        gen_geojson(geojson_filename, explored_tiles=explored_tiles_zone, zone_tiles=outer_zones[zone],
+                    limits_file=path, max_square=zone_max_square)
 
         user_result['zones'][zone] = {
             'zone': zones_name[zone],
@@ -245,6 +224,7 @@ for zone in zones_users_results.values():
 
 # COMMUNITY ZONES
 community_zones = {}
+
 for country in config['countries']:
     community_zones[country] = {'name': country, 'zones': {}}
     c_outer_zones = load_zones_outer(re_filter=config['countries'][country])
@@ -260,40 +240,10 @@ for country in config['countries']:
         community_tiles_zone = community_tiles_country & c_outer_zones[zone]
         zone_results.append([zone, len(community_tiles_zone), len(c_outer_zones[zone]),
                              len(community_tiles_zone) / len(c_outer_zones[zone]) * 100])
-
-
-
-        sc = []
-        zone_tiles = c_outer_zones[zone]
-        explored_tiles_zone = community_tiles_zone
-        non_explored_tiles_zone = zone_tiles - explored_tiles_zone
-
-        explored_geojson = shapely_to_geojson(unary_union([Tile(*t).polygon for t in explored_tiles_zone]))
-        non_explored_geojson = shapely_to_geojson(
-            geometry.MultiPolygon([Tile(*t).polygon for t in non_explored_tiles_zone]))
-
         geojson_filename = config['zones'][zone].replace("%GEN_ZONES%", GEN_ZONES).replace('.kml', '_community.geojson')
 
-        path = config['zones'][zone].replace("%GEN_ZONES%", GEN_ZONES).replace('.kml', '.geojson')
-        with open(path, 'r') as fP:
-            limit = geojson.load(fP)
-            sc.append(geojson.Feature(geometry=limit, properties= {"kind": "zone_limit"}))
-
-        sc.append(geojson.Feature(geometry=non_explored_geojson,
-                                  properties={"kind": "unvisited",
-                                              "size": len(non_explored_tiles_zone)
-                                              }))
-
-        sc.append(geojson.Feature(geometry=explored_geojson,
-                                  properties={"kind": "visited",
-                                              "size": len(explored_tiles_zone)
-                                              }))
-
-        geojson_collection = geojson.FeatureCollection(sc)
-
-        with FileCheck(geojson_filename) as h:
-            h.write(geojson.dumps(geojson_collection))
-
+        limits = config['zones'][zone].replace("%GEN_ZONES%", GEN_ZONES).replace('.kml', '.geojson')
+        gen_geojson(geojson_filename, explored_tiles=community_tiles_zone, zone_tiles=c_outer_zones[zone], limits_file=limits)
 
         community_zones[country]['zones'][zone] = {
             'zone': zones_name[zone],
