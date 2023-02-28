@@ -3,7 +3,7 @@ from pathlib import Path
 import json
 
 from common.config import load_users, GEN_PUBLIC_PATH, load_config, GEN_ZONES, GEN_USERS, GEN_RESULTS, GEN_PATH, \
-    PUBLIC_PATH
+    PUBLIC_PATH, GEN_COMMUNITY
 from common.statshunters import tiles_from_activities
 from common.zones import load_zones_outer
 from common.fileutils import FileCheck
@@ -96,8 +96,10 @@ def gen_geojson(output_file, explored_tiles=None, zone_tiles=None, limits_file=N
 
         sc.append(geojson.Feature( geometry=geometry_square, properties={"kind": "max_square", "size": max_square[2]}))
 
+    geojson_collection = geojson.FeatureCollection(sc)
+
     with FileCheck(output_file) as h:
-        h.write(geojson.dumps(output_file))
+        h.write(geojson.dumps(geojson_collection))
 
 
 def eddigton(data, value):
@@ -240,7 +242,7 @@ for country in config['countries']:
         community_tiles_zone = community_tiles_country & c_outer_zones[zone]
         zone_results.append([zone, len(community_tiles_zone), len(c_outer_zones[zone]),
                              len(community_tiles_zone) / len(c_outer_zones[zone]) * 100])
-        geojson_filename = config['zones'][zone].replace("%GEN_ZONES%", GEN_ZONES).replace('.kml', '_community.geojson')
+        geojson_filename = config['zones'][zone].replace("%GEN_ZONES%", GEN_COMMUNITY).replace('.kml', '_community.geojson')
 
         limits = config['zones'][zone].replace("%GEN_ZONES%", GEN_ZONES).replace('.kml', '.geojson')
         gen_geojson(geojson_filename, explored_tiles=community_tiles_zone, zone_tiles=c_outer_zones[zone], limits_file=limits)
