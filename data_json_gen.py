@@ -7,7 +7,7 @@ from common.config import load_users, GEN_PUBLIC_PATH, load_config, GEN_ZONES, G
 from common.statshunters import tiles_from_activities
 from common.zones import load_zones_outer
 from common.fileutils import FileCheck
-from common.squares import get_max_square, compute_max_cluster
+from common.squares import get_max_square, compute_max_cluster, compute_clusters
 from common.kmlutils import shapely_to_geojson
 from shapely.ops import unary_union
 from shapely import geometry
@@ -84,9 +84,13 @@ def gen_geojson(output_file, explored_tiles=None, zone_tiles=None, limits_file=N
     sc.append(geojson.Feature(geometry=explored_geojson,
                               properties={"kind": "visited", "size": len(explored_tiles) }))
     if cluster:
-        explored_geojson = shapely_to_geojson(unary_union([Tile(*t).polygon for t in cluster]))
-        sc.append(geojson.Feature(geometry=explored_geojson,
-                                  properties={"kind": "cluster", "size": len(cluster) }))
+        if isinstance(cluster, set):
+            cluster = [cluster]
+        for i in range(len(cluster)):
+            explored_geojson = shapely_to_geojson(unary_union([Tile(*t).polygon for t in cluster[i]]))
+            sc.append(geojson.Feature(geometry=explored_geojson,
+                                      properties={"kind": "cluster" if i == 0 else "sub-cluster", "size": len(cluster[i])}))
+
     if max_square:
         ms1 = coord_from_tile(max_square[0], max_square[1], 14)
         ms2 = coord_from_tile(max_square[0] + max_square[2], max_square[1] + max_square[2], 14)
@@ -193,12 +197,20 @@ for user in users:
     ur.update(result_dict[user['name']]['bbi'])
     bbi_results.append(ur)
     community_tiles |= user_tiles
-    geom_z = unary_union([Tile(*t).polygon for t in user_tiles])
-    geoms_users.append(geom_z)
+    # geom_z = unary_union([Tile(*t).polygon for t in user_tiles])
+    # geoms_users.append(geom_z)
 
-geom_z = unary_union(geoms_users)
-with open(os.path.join(GEN_RESULTS, "kikourou_tiles.geojson"), "w") as h:
-    h.write(geojson.dumps(shapely_to_geojson(geom_z)))
+# geom_z = unary_union(geoms_users)
+max_square = get_max_square(community_tiles)
+clusters = compute_clusters(community_tiles)[0:10]
+geojson_filename = os.path.join(GEN_USERS, user['name'], user['name'] + ".geojson")
+gen_geojson(os.path.join(GEN_RESULTS, "kikourou_tiles.geojson"),
+            explored_tiles=community_tiles,
+            max_square=max_square,
+            cluster=clusters)
+
+# with open(os.path.join(GEN_RESULTS, "kikourou_tiles.geojson"), "w") as h:
+#     h.write(geojson.dumps(shapely_to_geojson(geom_z)))
 
 fields_results = {}
 for f in bbi_config.keys():

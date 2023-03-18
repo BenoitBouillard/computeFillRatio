@@ -1,5 +1,25 @@
 import {styles, consts} from "./libs/consts.js?version=1.5"
 
+export function empty(elt) {
+    while(elt.firstChild) elt.removeChild(elt.firstChild)
+}
+export function addLiveEventListener(el, eventName, selector, eventHandler) {
+  const wrappedHandler = (e) => {
+    if (!e.target) return;
+    const el = e.target.closest(selector);
+    if (el) {
+      const newEvent = Object.create(e, {
+        target: {
+          value: el
+        }
+      });
+      eventHandler.call(el, newEvent);
+    }
+  };
+  el.addEventListener(eventName, wrappedHandler);
+  return wrappedHandler;
+}
+
 // ############ MAP SIZE ############
 {
     function resizeDz(){
@@ -161,6 +181,23 @@ $(document).ready(function(){
             else
                 return styles.tiles["tiles"]
         }
+        styles.tiles.onEachFeature = function(feature, layer) {
+            if (feature.properties.kind=="sub-cluster") {
+                layer.bindPopup("sous cluster: "+feature.properties.size+" carré(s)")
+            }
+            if (feature.properties.kind=="cluster") {
+                layer.bindPopup("cluster: "+feature.properties.size+" carré(s)")
+            }
+            if (feature.properties.kind=="max_square") {
+                layer.bindPopup("max square: "+feature.properties.size+"x"+feature.properties.size)
+            }
+            if (feature.properties.kind=="max_square_sub") {
+                layer.bindPopup("sous max-square: "+feature.properties.size+"x"+feature.properties.size)
+            }
+            if (feature.properties.kind=="visited") {
+                layer.bindPopup("visité: "+feature.properties.size+" carré(s)")
+            }
+        }
 
         function squadrats_display(data) {
             return L.geoJSON(data, styles.tiles).addTo(mymap)
@@ -190,6 +227,28 @@ $(document).ready(function(){
                 geojson = data
                 squadrats_display(geojson)
                 center()
+
+                const list_elt = document.getElementById("sub-cluster-list")
+                empty(list_elt)
+                for (const [index, feature] of data.features.entries()) {
+                    let html = false
+                    if ((feature.properties.kind=="sub-cluster") && (feature.properties.size>10)) {
+                        html = `<li><a class="dropdown-item" href="#" data-index="${index}">sous-cluster ${feature.properties.size}</a></li>`
+                    }
+                    if (feature.properties.kind=="max_square_sub") {
+                        html = `<li><a class="dropdown-item" href="#" data-index="${index}">sous-max-square ${feature.properties.size}x${feature.properties.size}</a></li>`
+                    }
+                    if (feature.properties.kind=="max_square") {
+                        html = `<li><a class="dropdown-item" href="#" data-index="${index}">max-square ${feature.properties.size}x${feature.properties.size}</a></li>`
+                    }
+                    if (feature.properties.kind=="cluster") {
+                        html = `<li><a class="dropdown-item" href="#" data-index="${index}">cluster ${feature.properties.size}</a></li>`
+                    }
+                    if (html) {
+                      list_elt.insertAdjacentHTML('beforeend', html)
+                    }
+                }
+
             });
         }
 
@@ -200,5 +259,13 @@ $(document).ready(function(){
 
         load_squadrats_tiles()
     }
+
+    addLiveEventListener(document.getElementById("sub-cluster-list"), "click", "a", function() {
+        let index = 1*this.dataset.index
+        let feature = geojson.features[index]
+        let bbox = turf.bbox(feature)
+        mymap.fitBounds([[bbox[1], bbox[0]], [bbox[3], bbox[2]]]);
+    });
+
 
 })

@@ -105,8 +105,8 @@ export const styles = {
             name: "clusters",
             weight : 0,
             opacity: 0.4,
-            fillOpacity : 0.15,
-            color : "blue",
+            fillOpacity : 0.2,
+            color : "#CC6633",
         },
         max_square: {
             name: "über",
