@@ -62,12 +62,12 @@ def get_osm_limits(rel):
         return None
     boundary_osm_url = 'https://www.openstreetmap.org/relation/{}'.format(rel)
     print("boundary_osm_url : ", boundary_osm_url)
-    inners = [geometry.LineString([(g.lon, g.lat) for g in m.geometry]) for m in relation.members if m.role == 'inner']
+    inners = [geometry.LineString([(float(g.lon), float(g.lat)) for g in m.geometry]) for m in relation.members if m.role == 'inner']
     inner = linemerge(inners)
     borders = unary_union(inner)  # linestrings to a MultiLineString
     polygons = list(polygonize(borders))
     inner_geom = geometry.MultiPolygon(polygons)
-    outers = [geometry.LineString([(g.lon, g.lat) for g in m.geometry]) for m in relation.members if m.role == 'outer']
+    outers = [geometry.LineString([(float(g.lon), float(g.lat)) for g in m.geometry]) for m in relation.members if m.role == 'outer']
     outer = linemerge(outers)
     borders = unary_union(outer)
     polygons = list(polygonize(borders))
@@ -101,6 +101,7 @@ if not force:
             zones_config = json.load(hr)
 
 #zones_config["Italie"] = {'name': "Italie", 'zones': {}}
+zones_config.pop("Pays-Bas")
 
 for country, cc in config['coutries_wikidata'].items():
     print("Process country", country)
