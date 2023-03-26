@@ -18,6 +18,8 @@ import re
 
 import argparse
 
+from nominatim_api import nominatim_get_toponym
+
 parser = argparse.ArgumentParser(description='Generate clusters')
 parser.add_argument('-u', '--user', dest="user", default=None, help="for a specific user")
 parser.add_argument('-f', '--force', dest="force", action="store_true", help="Force regeneration")
@@ -68,7 +70,7 @@ bbi_config = {
 bbi_results = []
 
 
-def gen_geojson(output_file, explored_tiles=None, zone_tiles=None, limits_file=None, max_square=None, cluster=None):
+def gen_geojson(output_file, explored_tiles=None, zone_tiles=None, limits_file=None, max_square=None, cluster=None, with_toponym=False):
     sc = []
     if limits_file:
         with open(limits_file, 'r') as fP:
@@ -80,25 +82,41 @@ def gen_geojson(output_file, explored_tiles=None, zone_tiles=None, limits_file=N
         non_explored_geojson = shapely_to_geojson(geometry.MultiPolygon([Tile(*t).polygon for t in non_explored_tiles_zone]))
         sc.append(geojson.Feature(geometry=non_explored_geojson,
                                   properties={"kind": "unvisited", "size": len(non_explored_tiles_zone) }))
-    explored_geojson = shapely_to_geojson(unary_union([Tile(*t).polygon for t in explored_tiles]))
+    geometry_tiles = unary_union([Tile(*t).polygon for t in explored_tiles])
+    explored_geojson = shapely_to_geojson(geometry_tiles)
     sc.append(geojson.Feature(geometry=explored_geojson,
-                              properties={"kind": "visited", "size": len(explored_tiles) }))
+                              properties={"kind": "visited",
+                                          "size": len(explored_tiles) }))
     if cluster:
         if isinstance(cluster, set):
             cluster = [cluster]
         for i in range(len(cluster)):
-            explored_geojson = shapely_to_geojson(unary_union([Tile(*t).polygon for t in cluster[i]]))
-            sc.append(geojson.Feature(geometry=explored_geojson,
-                                      properties={"kind": "cluster" if i == 0 else "sub-cluster", "size": len(cluster[i])}))
+            g = unary_union([Tile(*t).polygon for t in cluster[i]])
+            if with_toponym:
+                center = g.centroid
+                name = nominatim_get_toponym(center.y, center.x)
+            else:
+                name = None
+            sc.append(geojson.Feature(geometry=shapely_to_geojson(g),
+                                      properties={"kind": "cluster" if i == 0 else "sub-cluster",
+                                                  "size": len(cluster[i]),
+                                                  "name": name
+                                                  }))
 
     if max_square:
         ms1 = coord_from_tile(max_square[0], max_square[1], 14)
         ms2 = coord_from_tile(max_square[0] + max_square[2], max_square[1] + max_square[2], 14)
-        geometry_square = geojson.Polygon([[
-            [ms1[1], ms1[0]], [ms1[1], ms2[0]], [ms2[1], ms2[0]],[ms2[1], ms1[0]], [ms1[1], ms1[0]]
-        ]])
-
-        sc.append(geojson.Feature( geometry=geometry_square, properties={"kind": "max_square", "size": max_square[2]}))
+        g = geometry.Polygon([[ms1[1], ms1[0]], [ms1[1], ms2[0]], [ms2[1], ms2[0]],[ms2[1], ms1[0]], [ms1[1], ms1[0]]])
+        if with_toponym:
+            center = g.centroid
+            name = nominatim_get_toponym(center.y, center.x)
+        else:
+            name = None
+        sc.append(geojson.Feature( geometry=shapely_to_geojson(g),
+                                   properties={"kind": "max_square",
+                                               "size": max_square[2],
+                                               "name": name
+                                               }))
 
     geojson_collection = geojson.FeatureCollection(sc)
 
@@ -136,7 +154,7 @@ def generate_user(user):
     max_square = get_max_square(explored_tiles)
     cluster = compute_max_cluster(explored_tiles)
     geojson_filename = os.path.join(GEN_USERS, user['name'], user['name'] + ".geojson")
-    gen_geojson(geojson_filename, explored_tiles=explored_tiles, limits_file=None, max_square=max_square, cluster=cluster)
+    gen_geojson(geojson_filename, explored_tiles=explored_tiles, limits_file=None, max_square=max_square, cluster=cluster, with_toponym=True)
 
     user_result = {
         'user': user['name'],
@@ -207,7 +225,7 @@ geojson_filename = os.path.join(GEN_USERS, user['name'], user['name'] + ".geojso
 gen_geojson(os.path.join(GEN_RESULTS, "kikourou_tiles.geojson"),
             explored_tiles=community_tiles,
             max_square=max_square,
-            cluster=clusters)
+            cluster=clusters, with_toponym=True)
 
 # with open(os.path.join(GEN_RESULTS, "kikourou_tiles.geojson"), "w") as h:
 #     h.write(geojson.dumps(shapely_to_geojson(geom_z)))

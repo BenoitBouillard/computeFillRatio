@@ -174,28 +174,36 @@ $(document).ready(function(){
     // ############ TILES ############
     {
         var geojson;
+        var color_index = 0
 
         styles.tiles.style = function(feature) {
-            if (feature.properties.kind in styles.tiles)
+            if (feature.properties.kind == "sub-cluster") {
+                let s = {...styles.tiles["sub-cluster"]}
+                let h = Math.floor(color_index++%10)*28 + 280
+                s.fillOpacity = 0.5
+                s.color = `hsl(${h},100%,50%)`
+                return s
+            } else if (feature.properties.kind in styles.tiles)
                 return styles.tiles[feature.properties.kind]
             else
                 return styles.tiles["tiles"]
         }
+
         styles.tiles.onEachFeature = function(feature, layer) {
+            let desc = false
             if (feature.properties.kind=="sub-cluster") {
-                layer.bindPopup("sous cluster: "+feature.properties.size+" carré(s)")
+                desc = ("sous cluster: "+feature.properties.size+" carré(s)")
+            } else if (feature.properties.kind=="cluster") {
+                desc = ("cluster: "+feature.properties.size+" carré(s)")
+            } else if (feature.properties.kind=="max_square") {
+                desc = ("max square: "+feature.properties.size+"x"+feature.properties.size)
+            } else if (feature.properties.kind=="max_square_sub") {
+                desc = ("sous max-square: "+feature.properties.size+"x"+feature.properties.size)
+            } else if (feature.properties.kind=="visited") {
+                desc = ("visité: "+feature.properties.size+" carré(s)")
             }
-            if (feature.properties.kind=="cluster") {
-                layer.bindPopup("cluster: "+feature.properties.size+" carré(s)")
-            }
-            if (feature.properties.kind=="max_square") {
-                layer.bindPopup("max square: "+feature.properties.size+"x"+feature.properties.size)
-            }
-            if (feature.properties.kind=="max_square_sub") {
-                layer.bindPopup("sous max-square: "+feature.properties.size+"x"+feature.properties.size)
-            }
-            if (feature.properties.kind=="visited") {
-                layer.bindPopup("visité: "+feature.properties.size+" carré(s)")
+            if (desc) {
+                layer.bindPopup(`${feature.properties.name?feature.properties.name+"<br/>":""}${desc}`)
             }
         }
 
@@ -232,17 +240,21 @@ $(document).ready(function(){
                 empty(list_elt)
                 for (const [index, feature] of data.features.entries()) {
                     let html = false
+                    let desc = false
                     if ((feature.properties.kind=="sub-cluster") && (feature.properties.size>10)) {
-                        html = `<li><a class="dropdown-item" href="#" data-index="${index}">sous-cluster ${feature.properties.size}</a></li>`
+                        desc = `sous-cluster ${feature.properties.size}`
                     }
                     if (feature.properties.kind=="max_square_sub") {
-                        html = `<li><a class="dropdown-item" href="#" data-index="${index}">sous-max-square ${feature.properties.size}x${feature.properties.size}</a></li>`
+                        desc = `sous-max-square ${feature.properties.size}x${feature.properties.size}`
                     }
                     if (feature.properties.kind=="max_square") {
-                        html = `<li><a class="dropdown-item" href="#" data-index="${index}">max-square ${feature.properties.size}x${feature.properties.size}</a></li>`
+                        desc = `max-square ${feature.properties.size}x${feature.properties.size}`
                     }
                     if (feature.properties.kind=="cluster") {
-                        html = `<li><a class="dropdown-item" href="#" data-index="${index}">cluster ${feature.properties.size}</a></li>`
+                        desc = `cluster ${feature.properties.size}`
+                    }
+                    if (desc) {
+                        html = `<li><a class="dropdown-item" href="#" data-index="${index}">${desc} ${feature.properties.name || ""}</a></li>`
                     }
                     if (html) {
                       list_elt.insertAdjacentHTML('beforeend', html)
