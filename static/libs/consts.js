@@ -98,14 +98,14 @@ export const styles = {
             name: "yard(inho)",
             weight : 3,
             opacity: 0.5,
-            fillOpacity : 0.4,
+            fillOpacity : 0.35,
             color : "#CC6633",
         },
         "sub-cluster": {
             name: "clusters",
             weight : 0,
             opacity: 0.4,
-            fillOpacity : 0.4,
+            fillOpacity : 0.35,
             color : "#CC6633",
         },
         max_square: {
@@ -119,7 +119,7 @@ export const styles = {
             name: "carrés",
             weight : 2,
             opacity: 0.4,
-            fillOpacity : 0.25,
+            fillOpacity : 0.2,
             color : "blue"
         },
         zone_limit: {

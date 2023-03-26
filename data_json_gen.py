@@ -18,7 +18,7 @@ import re
 
 import argparse
 
-from nominatim_api import nominatim_get_toponym
+from nominatim_api import nominatim_get_description
 
 parser = argparse.ArgumentParser(description='Generate clusters')
 parser.add_argument('-u', '--user', dest="user", default=None, help="for a specific user")
@@ -94,7 +94,7 @@ def gen_geojson(output_file, explored_tiles=None, zone_tiles=None, limits_file=N
             g = unary_union([Tile(*t).polygon for t in cluster[i]])
             if with_toponym:
                 center = g.centroid
-                name = nominatim_get_toponym(center.y, center.x)
+                name = nominatim_get_description(center.y, center.x)
             else:
                 name = None
             sc.append(geojson.Feature(geometry=shapely_to_geojson(g),
@@ -109,7 +109,7 @@ def gen_geojson(output_file, explored_tiles=None, zone_tiles=None, limits_file=N
         g = geometry.Polygon([[ms1[1], ms1[0]], [ms1[1], ms2[0]], [ms2[1], ms2[0]],[ms2[1], ms1[0]], [ms1[1], ms1[0]]])
         if with_toponym:
             center = g.centroid
-            name = nominatim_get_toponym(center.y, center.x)
+            name = nominatim_get_description(center.y, center.x)
         else:
             name = None
         sc.append(geojson.Feature( geometry=shapely_to_geojson(g),
