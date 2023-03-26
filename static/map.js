@@ -180,7 +180,7 @@ $(document).ready(function(){
             if (feature.properties.kind == "sub-cluster") {
                 let s = {...styles.tiles["sub-cluster"]}
                 let h = Math.floor(color_index++%10)*28 + 280
-                s.fillOpacity = 0.5
+                //s.fillOpacity = 0.4
                 s.color = `hsl(${h},100%,50%)`
                 return s
             } else if (feature.properties.kind in styles.tiles)

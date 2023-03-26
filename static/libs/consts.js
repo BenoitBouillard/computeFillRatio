@@ -98,14 +98,14 @@ export const styles = {
             name: "yard(inho)",
             weight : 3,
             opacity: 0.5,
-            fillOpacity : 0.3,
+            fillOpacity : 0.4,
             color : "#CC6633",
         },
         "sub-cluster": {
             name: "clusters",
             weight : 0,
             opacity: 0.4,
-            fillOpacity : 0.6,
+            fillOpacity : 0.4,
             color : "#CC6633",
         },
         max_square: {

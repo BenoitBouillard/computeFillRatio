@@ -152,15 +152,15 @@ def generate_user(user):
             return previous_result, explored_tiles
     print("Treat "+user['name'])
     max_square = get_max_square(explored_tiles)
-    cluster = compute_max_cluster(explored_tiles)
+    clusters = compute_clusters(explored_tiles)[0:10]
     geojson_filename = os.path.join(GEN_USERS, user['name'], user['name'] + ".geojson")
-    gen_geojson(geojson_filename, explored_tiles=explored_tiles, limits_file=None, max_square=max_square, cluster=cluster, with_toponym=True)
+    gen_geojson(geojson_filename, explored_tiles=explored_tiles, limits_file=None, max_square=max_square, cluster=clusters, with_toponym=True)
 
     user_result = {
         'user': user['name'],
         'visited': len(explored_tiles),
         'square': max_square[2],
-        'cluster': len(cluster),
+        'cluster': len(clusters[0]),
         'geojson': os.path.relpath(geojson_filename, PUBLIC_PATH),
         'zones': {}
     }
