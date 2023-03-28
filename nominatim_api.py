@@ -68,8 +68,8 @@ def nominatim_get_toponym(lat, lon, cache=False):
     return None
 
 
-TOPONYM_ORDER_FIRST = ["village", "town", "city_district", "city", "municipality", "county", ]
-TOPONYM_ORDER_SECOND = ["state", "region", "country"]
+TOPONYM_ORDER_FIRST = ["village", "town", "city_district", "city", "municipality"]
+TOPONYM_ORDER_SECOND = ["county", "state", "region", "country"]
 def nominatim_get_description(lat, lon, cache=False):
     ts = nominatim_reverse(lat, lon, cache)
     first = None
